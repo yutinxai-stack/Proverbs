@@ -1,0 +1,1077 @@
+/* --------------------------------------------------
+   溫馨成語接龍 - 十字交叉棋盤填字與大地圖 CSS 樣式
+   -------------------------------------------------- */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+
+:root {
+  /* 溫馨暖色系調色盤 */
+  --bg-primary: #e6ccb2;       /* 溫和木質淺卡其背景 */
+  --bg-dark: #3d342e;          /* 沉穩深咖啡 */
+  
+  --color-primary: #d96a43;    /* 溫暖柿子橙 */
+  --color-secondary: #5c7f67;  /* 沉穩松針綠 */
+  --color-accent: #f7b05b;     /* 溫馨芒果黃 */
+  
+  --text-main: #3d342e;        /* 深咖啡色文字 */
+  --text-muted: #706258;       /* 灰褐色說明 */
+  --text-light: #ffffff;
+  
+  --color-success: #4a8f66;    /* 竹綠 */
+  --color-danger: #d94e34;     /* 柿紅 */
+  
+  /* 十字填字專用色 */
+  --wood-border: #7f5539;      /* 深木色框 */
+  --wood-light: #ede0d4;       /* 淺木紋底 */
+  --wood-dark: #b7b7a4;        /* 網格陰影板 */
+  
+  --char-yellow: #ffd166;      /* 經典大黃字卡底色 */
+  --char-selected: #d90429;    /* 紅色選中格底色 */
+  
+  --font-family: 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-primary);
+  background-image: radial-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 0);
+  background-size: 24px 24px;
+  color: var(--text-main);
+  font-family: var(--font-family);
+  font-size: 20px;
+  line-height: 1.6;
+}
+
+/* 應用程式容器 */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 0 16px;
+  max-width: 900px;
+  margin: 0 auto;
+  background-color: #faf6f0;
+  box-shadow: 0 0 30px rgba(0,0,0,0.1);
+}
+
+/* 頂部標頭 */
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 16px;
+  border-bottom: 4px solid var(--wood-border);
+  background-color: #f7f1e5;
+  border-radius: 0 0 16px 16px;
+  gap: 16px;
+}
+
+.header-logo h1 {
+  font-size: 2.2rem;
+  color: var(--wood-border);
+  font-weight: 900;
+  text-shadow: 1px 1px 0px #fff;
+}
+
+.header-logo .subtitle {
+  font-size: 1rem;
+  color: var(--text-muted);
+  font-weight: bold;
+}
+
+.header-score {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: var(--color-primary);
+  background-color: #fff2e6;
+  padding: 8px 16px;
+  border-radius: 30px;
+  border: 2px solid var(--color-primary);
+  margin-right: 8px;
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.header-user-status {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #ebd9c5;
+  padding: 6px 12px;
+  border-radius: 30px;
+  font-size: 0.95rem;
+}
+
+/* 通用按鈕樣式 */
+.btn {
+  font-family: var(--font-family);
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.btn-large {
+  font-size: 1.25rem;
+  padding: 12px 24px;
+}
+
+.btn-header {
+  font-size: 0.95rem;
+  padding: 8px 14px;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--text-light);
+}
+
+.btn-secondary {
+  background-color: var(--color-secondary);
+  color: var(--text-light);
+}
+
+.btn-accent {
+  background-color: var(--color-accent);
+  color: var(--text-main);
+}
+
+.btn:disabled {
+  background-color: #d8cfc4;
+  color: #8c8176;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.game-main {
+  flex: 1;
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* --------------------------------------------------
+   關卡大地圖 (Candy Crush S-Curve Map)
+   -------------------------------------------------- */
+.map-view-container {
+  background-color: #f7ede2;
+  border-radius: 24px;
+  padding: 16px;
+  border: 4px solid var(--wood-border);
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+  overflow: auto; /* 允許大世界地圖的捲動 */
+  max-width: 100%;
+  height: 70vh; /* 限制高度使其能在內部產生捲動條 */
+  scroll-behavior: auto; /* 瞬間定位到所在關卡，不進行滑動移動 */
+  -webkit-overflow-scrolling: touch; /* 行動裝置原生滑動慣性 */
+}
+
+/* 讓地圖捲軸更為醒目，引導長輩 */
+.map-view-container::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+.map-view-container::-webkit-scrollbar-track {
+  background: #f8f1e5;
+  border-radius: 10px;
+}
+.map-view-container::-webkit-scrollbar-thumb {
+  background: var(--wood-border);
+  border-radius: 10px;
+  border: 3px solid #f8f1e5;
+}
+.map-view-container::-webkit-scrollbar-thumb:hover {
+  background: #8b5e3c;
+}
+
+.map-title-bar {
+  text-align: center;
+  margin-bottom: 16px;
+  background-color: #ebd9c5;
+  padding: 12px;
+  border-radius: 16px;
+  border: 2px solid var(--wood-border);
+}
+
+.map-title {
+  font-size: 1.7rem;
+  font-weight: 900;
+  color: var(--wood-border);
+  margin-bottom: 4px;
+}
+
+.map-subtitle {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  font-weight: bold;
+}
+
+.map-scroll-panel {
+  position: relative;
+  min-width: fit-content;
+  margin: 0 auto;
+}
+
+/* 世界地圖畫布 */
+.map-track-canvas.world-map {
+  position: relative;
+  width: 1300px;
+  height: 750px;
+  background-image: url("./assets/world_map_bg.png");
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 20px;
+  border: 4px solid var(--wood-border);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+/* SVG 連線軌跡 */
+.map-connection-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 已解鎖航線：橘金色發光實線 */
+.route-unlocked {
+  stroke: #ff7b00;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0px 0px 3px rgba(255, 123, 0, 0.8));
+  animation: dash-draw 2s linear infinite;
+}
+
+/* 未解鎖航線：灰色虛線 */
+.route-locked {
+  stroke: #9c9c9c;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* 地圖節點：圓形地標 PIN */
+.map-node {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-family);
+  font-size: 0.95rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 5;
+  transform: translate(-50%, -50%);
+}
+
+.map-node.unlocked {
+  background: linear-gradient(135deg, #ff9f1c, #ffbf69);
+  color: #ffffff;
+}
+
+.map-node.unlocked:hover {
+  transform: translate(-50%, -50%) scale(1.25);
+  box-shadow: 0 6px 12px rgba(255, 159, 28, 0.4);
+  z-index: 15;
+}
+
+/* 當前進度關卡：閃爍藍色發光 */
+.map-node.active {
+  background: linear-gradient(135deg, #2ec4b6, #cbf3f0);
+  color: #004d40;
+  border-color: #ffffff;
+  box-shadow: 0 0 0 5px rgba(46, 196, 182, 0.4), 0 6px 12px rgba(0,0,0,0.3);
+  animation: active-pulse-node 1.2s infinite alternate;
+  z-index: 10;
+}
+
+.map-node.locked {
+  background: linear-gradient(135deg, #a8a896, #b7b7a4);
+  color: #ffffff;
+  border-color: #dcdccb;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.map-node .lock-icon {
+  font-size: 0.75rem;
+}
+
+/* 城市地名標籤 */
+.node-city-name {
+  position: absolute;
+  top: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.78rem;
+  color: #4a3319;
+  background-color: rgba(255, 248, 240, 0.9);
+  padding: 1px 5px;
+  border-radius: 6px;
+  font-weight: 900;
+  white-space: nowrap;
+  border: 1px solid #ebd9c5;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  pointer-events: none;
+}
+
+.map-node.active .node-city-name {
+  background-color: #2ec4b6;
+  color: #ffffff;
+  border-color: #2ec4b6;
+  box-shadow: 0 2px 6px rgba(46, 196, 182, 0.3);
+}
+
+@keyframes active-pulse-node {
+  0% { transform: translate(-50%, -50%) scale(1.0); }
+  100% { transform: translate(-50%, -50%) scale(1.22); }
+}
+
+/* --------------------------------------------------
+   十字交叉填字遊戲畫面
+   -------------------------------------------------- */
+
+/* 頂部雙向提示 */
+.clues-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.clue-card {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  border: 3px solid #333333;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 120px;
+  display: flex;
+  gap: 12px;
+}
+
+.clue-card.active {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 10px rgba(217, 106, 67, 0.4);
+}
+
+.clue-card.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.clue-tag {
+  background-color: var(--color-primary);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-weight: 900;
+  font-size: 0.9rem;
+  align-self: flex-start;
+  white-space: nowrap;
+}
+
+.clue-card.vertical .clue-tag {
+  background-color: var(--color-secondary);
+}
+
+.clue-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.clue-content.empty {
+  justify-content: center;
+  align-items: center;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.clue-template {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--color-accent);
+  letter-spacing: 4px;
+}
+
+.clue-def {
+  font-size: 0.95rem;
+  color: #dddddd;
+  line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* 十字填字棋盤 */
+.crossword-board-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--wood-light);
+  border-radius: 24px;
+  padding: 24px;
+  border: 6px solid var(--wood-border);
+  box-shadow: inset 0 0 15px rgba(0,0,0,0.1), 0 10px 20px rgba(0,0,0,0.1);
+  background-image: radial-gradient(#d5c3b2 15%, transparent 15%);
+  background-size: 20px 20px;
+}
+
+.crossword-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px;
+  background-color: rgba(0,0,0,0.05);
+  border-radius: 12px;
+}
+
+.crossword-row {
+  display: flex;
+  gap: 3px;
+}
+
+/* 網格單元格 */
+.grid-cell {
+  width: 52px;
+  height: 52px;
+  border: none;
+  font-family: var(--font-family);
+  font-size: 2.1rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.1s ease;
+  user-select: none;
+}
+
+.grid-cell.empty-slot {
+  background-color: transparent;
+  pointer-events: none;
+}
+
+.grid-cell.letter-slot {
+  background-color: #ffffff;
+  color: #333333;
+  box-shadow: inset 0 -3px 0 rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.05);
+  cursor: pointer;
+}
+
+/* 透露的字元 (黃底黑字) */
+.grid-cell.letter-slot.revealed {
+  background-color: var(--char-yellow);
+  color: #000000;
+  box-shadow: inset 0 -3px 0 #e5be3c, 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* 玩家答對的字元 (綠底白字) */
+.grid-cell.letter-slot.user-correct {
+  background-color: var(--color-secondary);
+  color: #ffffff;
+  box-shadow: inset 0 -3px 0 #4c6a55, 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* 玩家填入但尚未鎖定的字 */
+.grid-cell.letter-slot.user-filled {
+  background-color: #ffffff;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  animation: pop 0.12s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* 被選中的格子 (紅底白字) */
+.grid-cell.letter-slot.selected {
+  background-color: var(--char-selected);
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(217, 4, 41, 0.6);
+  transform: scale(1.08);
+  z-index: 5;
+  animation: selected-pulse 1s infinite alternate;
+}
+
+@keyframes selected-pulse {
+  0% { box-shadow: 0 0 6px rgba(217, 4, 41, 0.4); }
+  100% { box-shadow: 0 0 15px rgba(217, 4, 41, 0.8); }
+}
+
+/* 備選字盤區域 */
+.wordboard-section {
+  background-color: #f7f1e5;
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+  border: 3px solid var(--wood-border);
+}
+
+.select-card-prompt {
+  font-size: 1.2rem;
+  text-align: center;
+  color: var(--text-muted);
+  padding: 32px 16px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 2px dashed #d3c7b6;
+  font-weight: bold;
+}
+
+.word-board {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.board-header {
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.words-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 12px;
+  justify-content: center;
+}
+
+.word-tile {
+  font-family: var(--font-family);
+  font-size: 2.3rem;
+  font-weight: bold;
+  height: 68px;
+  border: 3px solid #a8dadc;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #e0f2f1, #b2dfdb);
+  color: #004d40;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.word-tile:hover:not(:disabled) {
+  transform: scale(1.08);
+  border-color: #00796b;
+  background: linear-gradient(135deg, #e0f7fa, #80deea);
+}
+
+.word-tile:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+.word-tile.used {
+  background: #dcd7cd;
+  color: #9c978f;
+  border-color: #ccc7bd;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.board-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.board-actions button {
+  flex: 1;
+}
+
+/* 底部提示與底腳 */
+.game-footer {
+  text-align: center;
+  padding: 16px 0 30px 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  border-top: 2px dashed var(--wood-border);
+}
+
+/* 彈出視窗樣式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(61, 52, 46, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal-content {
+  background-color: #ffffff;
+  border-radius: 28px;
+  padding: 32px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+  border: 4px solid var(--color-accent);
+  position: relative;
+  animation: modal-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 18px;
+  font-size: 2rem;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.modal-content h2 {
+  font-size: 1.8rem;
+  color: var(--color-primary);
+  margin-bottom: 20px;
+}
+
+/* 排行榜 */
+.leaderboard-modal {
+  max-width: 600px;
+}
+
+.leaderboard-table-container {
+  max-height: 380px;
+  overflow-y: auto;
+  margin: 16px 0;
+  border: 2px solid #eae1d5;
+  border-radius: 16px;
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1.15rem;
+}
+
+.leaderboard-table th, 
+.leaderboard-table td {
+  padding: 12px 16px;
+  text-align: left;
+}
+
+.leaderboard-table th {
+  background-color: #f5ede2;
+  color: var(--text-muted);
+  font-weight: bold;
+}
+
+.leaderboard-table tr {
+  border-bottom: 1px solid #eee7de;
+}
+
+.row-current-user {
+  background-color: #fff9e6;
+  font-weight: bold;
+}
+
+.tag-you {
+  background-color: var(--color-primary);
+  color: white;
+  font-size: 0.85rem;
+  padding: 2px 6px;
+  border-radius: 6px;
+  margin-left: 6px;
+}
+
+/* 過關畫面 */
+.level-clear {
+  background-color: rgba(30, 20, 10, 0.85);
+}
+
+.clear-emoji {
+  font-size: 6rem;
+  animation: spin 1s ease-out;
+}
+
+.score-bonus {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: var(--color-success);
+  margin: 16px 0 24px 0;
+  background-color: #eaf6ee;
+  padding: 8px 16px;
+  border-radius: 30px;
+  display: inline-block;
+}
+
+.text-center { text-align: center; }
+
+@keyframes pop {
+  0% { transform: scale(0.7); }
+  100% { transform: scale(1.0); }
+}
+
+@keyframes modal-pop {
+  0% { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg) scale(0.5); }
+  50% { transform: rotate(180deg) scale(1.2); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite alternate;
+}
+
+@keyframes bounce {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-8px); }
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-weight: bold;
+  color: var(--text-muted);
+}
+
+.form-group input {
+  font-family: var(--font-family);
+  font-size: 1.15rem;
+  padding: 10px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  outline: none;
+}
+
+.form-group input:focus {
+  border-color: var(--color-primary);
+}
+
+.auth-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-toggle {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.toggle-link {
+  background: none;
+  border: none;
+  color: var(--color-secondary);
+  font-size: 1rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.error-message {
+  color: var(--color-danger);
+  font-weight: bold;
+  text-align: center;
+}
+
+/* 成語說明最下方區塊 */
+.bottom-explanation-panel {
+  margin-top: 20px;
+  padding: 18px 22px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 3px solid var(--wood-border);
+  text-align: left;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.02), 0 4px 6px rgba(0,0,0,0.02);
+}
+
+.explanation-title {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: var(--color-primary);
+  margin-bottom: 6px;
+  border-bottom: 2px dashed #ebd9c5;
+  padding-bottom: 4px;
+}
+
+.explanation-pinyin {
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.explanation-def {
+  font-size: 1.25rem;
+  color: var(--text-main);
+  line-height: 1.6;
+}
+
+.explanation-empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  padding: 16px 0;
+  font-weight: bold;
+}
+
+/* ==================================================
+   響應式跨裝置自適應 (手機、平板優化)
+   ================================================== */
+
+/* 平板與手機通用 (小於 768px) */
+@media (max-width: 768px) {
+  body {
+    font-size: 18px;
+  }
+
+  .app-container {
+    padding: 0 8px;
+  }
+
+  .game-header {
+    padding: 12px 10px;
+    gap: 8px;
+    flex-wrap: wrap; /* 讓 header 在平板/手機上可以自動折行 */
+  }
+
+  .header-logo h1 {
+    font-size: 1.6rem;
+  }
+
+  .header-logo .subtitle {
+    font-size: 0.85rem;
+  }
+
+  .header-user-status {
+    width: 100%;
+    justify-content: space-between;
+    gap: 6px;
+  }
+
+  .header-score {
+    font-size: 1rem;
+    padding: 6px 12px;
+    margin-right: 0;
+  }
+
+  .user-info {
+    font-size: 0.85rem;
+    padding: 5px 10px;
+  }
+
+  .btn-header {
+    font-size: 0.85rem;
+    padding: 6px 10px;
+  }
+
+  /* 地圖高度自適應 */
+  .map-view-container {
+    height: 60vh;
+    padding: 8px;
+  }
+
+  .map-title {
+    font-size: 1.4rem;
+  }
+
+  .map-subtitle {
+    font-size: 0.9rem;
+  }
+}
+
+/* 手機直屏特別優化 (小於 600px) */
+@media (max-width: 600px) {
+  .game-main {
+    padding: 10px 0;
+    gap: 12px;
+  }
+
+  /* 縮小 10x10 棋盤以完美塞進手機螢幕 */
+  .crossword-board-section {
+    padding: 8px;
+    border-width: 4px;
+    border-radius: 16px;
+  }
+
+  .crossword-grid {
+    gap: 2px;
+    padding: 4px;
+  }
+
+  .crossword-row {
+    gap: 2px;
+  }
+
+  .grid-cell {
+    width: 32px;
+    height: 32px;
+    font-size: 1.35rem; /* 大字體依然好讀 */
+    border-radius: 6px;
+  }
+
+  .grid-cell.revealed, .grid-cell.correct {
+    border-width: 2px;
+  }
+
+  /* 備選字盤排版優化 */
+  .word-board {
+    padding: 10px;
+    border-radius: 16px;
+  }
+
+  .board-header {
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+  }
+
+  .words-grid {
+    grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+    gap: 8px;
+  }
+
+  .word-tile {
+    font-size: 1.6rem;
+    height: 52px;
+    border-radius: 12px;
+  }
+
+  .board-actions {
+    margin-top: 10px;
+    gap: 8px;
+  }
+
+  .btn-large {
+    font-size: 1rem;
+    padding: 10px 16px;
+  }
+
+  /* 成語提示面板縮小 */
+  .bottom-explanation-panel {
+    padding: 12px 16px;
+    margin-top: 10px;
+    border-radius: 12px;
+  }
+
+  .explanation-title {
+    font-size: 1.15rem;
+  }
+
+  .explanation-def {
+    font-size: 1.05rem;
+  }
+
+  .explanation-empty {
+    font-size: 1rem;
+    padding: 8px 0;
+  }
+
+  /* 登入彈窗與過關彈窗響應式 */
+  .modal-content {
+    width: 95% !important;
+    padding: 20px 16px !important;
+  }
+
+  .modal-content h2 {
+    font-size: 1.4rem;
+  }
+
+  .auth-form {
+    gap: 12px;
+  }
+
+  .form-group label {
+    font-size: 0.9rem;
+  }
+
+  .form-group input {
+    font-size: 1rem;
+    padding: 8px 12px;
+  }
+
+  /* 管理員後台響應式 */
+  .admin-panel-container {
+    padding: 10px !important;
+  }
+
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 10px;
+  }
+
+  .admin-tabs {
+    width: 100%;
+  }
+
+  .admin-tab-btn {
+    flex: 1;
+    font-size: 0.9rem !important;
+    padding: 8px 10px !important;
+    text-align: center;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  table {
+    min-width: 500px; /* 強制表格在手機上可滾動 */
+  }
+
+  th, td {
+    padding: 8px 6px !important;
+    font-size: 0.9rem !important;
+  }
+}
+
