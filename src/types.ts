@@ -46,3 +46,8 @@ export interface LeaderboardEntry {
   totalScore: number;
   updatedAt: number;
 }
+
+export interface LevelOverride {
+  levelNumber: number;
+  placedIdioms: PlacedIdiom[];
+}

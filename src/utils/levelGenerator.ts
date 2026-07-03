@@ -1,6 +1,5 @@
+import type { RawIdiom, GameLevel, PlacedIdiom, GridCell, LevelOverride } from "../types";
 import idiomsData from "../data/idioms.json";
-import type { RawIdiom, GameLevel, PlacedIdiom, GridCell } from "../types";
-
 // Seeded random generator (SFC32)
 function createRng(seed: number) {
   let a = (seed * 15485863) >>> 0;
@@ -45,9 +44,121 @@ const globalRng = createRng(42);
 const shuffledMainList = shuffle(mainIdiomsPool, globalRng);
 const shuffledAllList = shuffle(rawIdiomsAll, globalRng);
 
+let levelOverrides: Record<number, LevelOverride> = {};
+
+export function setLevelOverrides(overrides: Record<number, LevelOverride>) {
+  levelOverrides = overrides;
+}
+
 export function generateLevel(levelNumber: number): GameLevel {
-  const rng = createRng(levelNumber + 500); // Shift seed offset
   const gridSize = 10;
+
+  // Check if custom level override exists
+  if (levelOverrides && levelOverrides[levelNumber]) {
+    const overrideData = levelOverrides[levelNumber];
+    const placedIdioms: PlacedIdiom[] = JSON.parse(JSON.stringify(overrideData.placedIdioms));
+    let grid: (GridCell | null)[][] = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null));
+
+    // Place overrides in grid cells
+    placedIdioms.forEach((pi, idiomIdx) => {
+      for (let i = 0; i < 4; i++) {
+        const cellX = pi.isHorizontal ? pi.x + i : pi.x;
+        const cellY = pi.isHorizontal ? pi.y : pi.y + i;
+
+        if (cellX >= 0 && cellX < gridSize && cellY >= 0 && cellY < gridSize) {
+          const existing = grid[cellY][cellX];
+          if (existing) {
+            if (!existing.idiomIndices.includes(idiomIdx)) {
+              existing.idiomIndices.push(idiomIdx);
+            }
+          } else {
+            grid[cellY][cellX] = {
+              x: cellX,
+              y: cellY,
+              char: pi.idiom[i],
+              userChar: "",
+              isSystemRevealed: false,
+              idiomIndices: [idiomIdx]
+            };
+          }
+        }
+      }
+    });
+
+    // 4. Reveal clues (characters) to players
+    const allCells: GridCell[] = [];
+    grid.forEach(row => row.forEach(cell => {
+      if (cell) allCells.push(cell);
+    }));
+
+    const cellShuffleRng = createRng(levelNumber + 999);
+    const shuffledCells = shuffle(allCells, cellShuffleRng);
+
+    // Reveal intersection cells
+    allCells.forEach(cell => {
+      if (cell.idiomIndices.length > 1) {
+        cell.isSystemRevealed = true;
+      }
+    });
+
+    // Calculate target reveal count based on level ratio
+    let revealRatio = 0.35;
+    if (levelNumber <= 5) revealRatio = 0.55;
+    else if (levelNumber <= 10) revealRatio = 0.45;
+
+    const targetRevealCount = Math.floor(allCells.length * revealRatio);
+    let currentRevealCount = allCells.filter(c => c.isSystemRevealed).length;
+
+    for (let i = 0; i < shuffledCells.length; i++) {
+      if (currentRevealCount >= targetRevealCount) break;
+      const cell = shuffledCells[i];
+      if (!cell.isSystemRevealed) {
+        cell.isSystemRevealed = true;
+        currentRevealCount++;
+      }
+    }
+
+    // Fill in userChar for revealed cells
+    allCells.forEach(cell => {
+      if (cell.isSystemRevealed) {
+        cell.userChar = cell.char;
+      }
+    });
+
+    // 5. Generate character pool (tiles)
+    const hiddenChars: string[] = [];
+    allCells.forEach(cell => {
+      if (!cell.isSystemRevealed) {
+        hiddenChars.push(cell.char);
+      }
+    });
+
+    let distractorCount = 0;
+    if (levelNumber > 10 && levelNumber <= 20) distractorCount = 2;
+    else if (levelNumber > 20 && levelNumber <= 35) distractorCount = 4;
+    else if (levelNumber > 35) distractorCount = 6;
+
+    const distractors: string[] = [];
+    const poolRng = createRng(levelNumber + 777);
+    while (distractors.length < distractorCount) {
+      const randomIdiom = rawIdiomsAll[Math.floor(poolRng() * rawIdiomsAll.length)].i;
+      const randomChar = randomIdiom[Math.floor(poolRng() * 4)];
+      if (!hiddenChars.includes(randomChar) && !distractors.includes(randomChar) && !allCells.some(c => c.isSystemRevealed && c.char === randomChar)) {
+        distractors.push(randomChar);
+      }
+    }
+
+    const charPool = shuffle([...hiddenChars, ...distractors], poolRng);
+
+    return {
+      levelNumber,
+      placedIdioms,
+      grid,
+      charPool
+    };
+  }
+
+  const rng = createRng(levelNumber + 500); // Shift seed offset
   
   // 1. Calculate Main and Sub offsets from previous levels to ensure no repeats
   let mainOffset = 0;

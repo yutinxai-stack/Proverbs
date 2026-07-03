@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { generateLevel } from "./utils/levelGenerator";
+import { generateLevel, setLevelOverrides } from "./utils/levelGenerator";
 import type { GameLevel, GridCell } from "./types";
 import { WordBoard } from "./components/WordBoard";
 import type { PoolWord } from "./components/WordBoard";
@@ -7,7 +7,7 @@ import { AuthModal } from "./components/AuthModal";
 import { Leaderboard } from "./components/Leaderboard";
 import { AdminPanel } from "./components/AdminPanel";
 import { isFirebaseConfigured, db } from "./firebase";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, collection, getDocs } from "firebase/firestore";
 
 interface TourNode {
   level: number;
@@ -17,9 +17,9 @@ interface TourNode {
 }
 
 const WORLD_TOUR_NODES: TourNode[] = [
-  { level: 1, name: "台北", left: 77, top: 50 },
-  { level: 2, name: "高雄", left: 74, top: 57 },
-  { level: 3, name: "沖繩", left: 81, top: 48 },
+  { level: 1, name: "台北", left: 76.8, top: 48.5 },
+  { level: 2, name: "高雄", left: 76.0, top: 50.5 },
+  { level: 3, name: "沖繩", left: 79.0, top: 47.0 },
   { level: 4, name: "東京", left: 86, top: 40 },
   { level: 5, name: "首爾", left: 81, top: 36 },
   { level: 6, name: "北京", left: 74, top: 30 },
@@ -65,8 +65,8 @@ const WORLD_TOUR_NODES: TourNode[] = [
   { level: 46, name: "溫哥華", left: 5, top: 18 },
   { level: 47, name: "阿拉斯加", left: 94, top: 18 },
   { level: 48, name: "海參崴", left: 88, top: 28 },
-  { level: 49, name: "花蓮", left: 79, top: 53 },
-  { level: 50, name: "玉山", left: 76, top: 55 }
+  { level: 49, name: "花蓮", left: 76.7, top: 49.5 },
+  { level: 50, name: "玉山", left: 76.3, top: 49.8 }
 ];
 
 function App() {
@@ -92,9 +92,49 @@ function App() {
 
   // User Auth status
   const [currentUser, setCurrentUser] = useState<string | null>(null);
+  
+  // Cache trigger state for level overrides reload
+  const [overridesTrigger, setOverridesTrigger] = useState(0);
 
-  // 1. Initial Load: Auto login guest or get from localStorage
+  const loadOverrides = async () => {
+    const overrideMap: Record<number, any> = {};
+    if (isFirebaseConfigured) {
+      try {
+        const querySnapshot = await getDocs(collection(db, "levelOverrides"));
+        querySnapshot.forEach((docSnap: any) => {
+          const data = docSnap.data();
+          const lvl = Number(docSnap.id.replace("level_", "")) || data.levelNumber;
+          if (lvl) {
+            overrideMap[lvl] = data;
+          }
+        });
+      } catch (e) {
+        console.error("Error loading level overrides from firebase:", e);
+      }
+    }
+
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith("idiom_level_override_")) {
+          const lvl = Number(key.replace("idiom_level_override_", ""));
+          const dataJson = localStorage.getItem(key);
+          if (lvl && dataJson) {
+            overrideMap[lvl] = JSON.parse(dataJson);
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Error loading level overrides from localStorage:", e);
+    }
+
+    setLevelOverrides(overrideMap);
+    setOverridesTrigger(prev => prev + 1);
+  };
+
+  // 1. Initial Load: Auto login guest or get from localStorage, and load level overrides
   useEffect(() => {
+    loadOverrides();
     const savedUser = localStorage.getItem("idiom_user");
     if (savedUser) {
       setCurrentUser(savedUser);
@@ -184,7 +224,7 @@ function App() {
       isUsed: false
     }));
     setPoolWords(words);
-  }, [levelNumber]);
+  }, [levelNumber, overridesTrigger]);
 
   // Sync progress
   const saveProgress = async (newMaxLevel: number, newScore: number) => {
@@ -722,7 +762,7 @@ function App() {
       {/* Main Area */}
       <main className="game-main">
         {currentUser === "owner" ? (
-          <AdminPanel onLogout={handleLogout} tourNodes={WORLD_TOUR_NODES} />
+          <AdminPanel onLogout={handleLogout} tourNodes={WORLD_TOUR_NODES} onRefreshOverrides={loadOverrides} />
         ) : viewMode === "map" ? (
           /* Candy Crush map */
           renderMap()

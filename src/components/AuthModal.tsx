@@ -59,12 +59,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setError("");
     setLoading(true);
 
-    // Intercept owner admin login
-    if (username.trim() === "owner" && password === "123321") {
-      setLoading(false);
-      onLoginSuccess("owner", 0, 1);
-      onClose();
-      return;
+    // Intercept owner admin login (case-insensitive, supports owner and admin)
+    const normUser = username.trim().toLowerCase();
+    const isAdminAccount = normUser === "owner" || normUser === "admin";
+    if (isAdminAccount) {
+      if (password === "123321") {
+        setLoading(false);
+        onLoginSuccess(normUser, 0, 1);
+        onClose();
+        return;
+      } else {
+        setLoading(false);
+        setError("管理員密碼錯誤，請重新輸入");
+        return;
+      }
     }
 
     if (!isFirebaseConfigured) {
