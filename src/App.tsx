@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { generateLevel, setLevelOverrides } from "./utils/levelGenerator";
+import { audioManager } from "./utils/audio";
 import type { GameLevel, GridCell } from "./types";
 import { WordBoard } from "./components/WordBoard";
 import type { PoolWord } from "./components/WordBoard";
@@ -73,6 +74,13 @@ function App() {
   const [levelNumber, setLevelNumber] = useState<number>(1);
   const [maxUnlockedLevel, setMaxUnlockedLevel] = useState<number>(1);
   const [totalScore, setTotalScore] = useState<number>(0);
+  const [isMuted, setIsMuted] = useState(true);
+
+  const handleToggleMute = () => {
+    const nextMute = audioManager.toggleMute();
+    setIsMuted(nextMute);
+  };
+
   const [levelData, setLevelData] = useState<GameLevel | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   
@@ -324,9 +332,12 @@ function App() {
     const cell = getCell(x, y);
     if (!cell || cell.isSystemRevealed || cell.isUserCorrect) return;
 
+    audioManager.playClick();
+
     // 1. Update grid and cell
     const updatedGrid = [...levelData.grid.map(row => [...row])];
     const targetCell = { ...cell };
+    targetCell.isError = false;
     
     // If this slot was already filled by user, return that tile to pool first
     const previousTileId = (targetCell as any).tileId;
@@ -446,6 +457,7 @@ function App() {
       });
 
       if (levelComplete) {
+        audioManager.playLevelClear();
         setLevelCleared(true);
         const levelClearedBonus = 200;
         const finalScore = newScore + levelClearedBonus;
@@ -458,38 +470,32 @@ function App() {
         }
         saveProgress(newMax, finalScore);
       } else {
+        audioManager.playCorrect();
         saveProgress(maxUnlockedLevel, newScore);
       }
     } else {
-      // Incorrect! Clear player's inputs for this idiom to avoid frustration, restore tiles to pool
-      alert(`拼出的「${assembled}」不是正確答案喔，請再試試看！`);
+      audioManager.playWrong();
       
-      let restoredPool = [...currentPool];
+      let firstErrorCell: { x: number; y: number } | null = null;
       for (let i = 0; i < 4; i++) {
         const cx = placed.isHorizontal ? placed.x + i : placed.x;
         const cy = placed.isHorizontal ? placed.y : placed.y + i;
         const cell = currentGrid[cy][cx];
         
         if (cell && !cell.isSystemRevealed && !cell.isUserCorrect) {
-          const tileId = (cell as any).tileId;
-          if (tileId) {
-            restoredPool = restoredPool.map(w => w.id === tileId ? { ...w, isUsed: false } : w);
+          if (cell.userChar !== cell.char) {
+            cell.isError = true;
+            if (!firstErrorCell) {
+              firstErrorCell = { x: cx, y: cy };
+            }
+          } else {
+            cell.isError = false;
           }
-          cell.userChar = "";
-          (cell as any).tileId = "";
         }
       }
-      setPoolWords(restoredPool);
       
-      // Auto select the first slot of this idiom for re-entry
-      for (let i = 0; i < 4; i++) {
-        const cx = placed.isHorizontal ? placed.x + i : placed.x;
-        const cy = placed.isHorizontal ? placed.y : placed.y + i;
-        const cell = currentGrid[cy][cx];
-        if (cell && !cell.isSystemRevealed && !cell.isUserCorrect) {
-          setSelectedCell({ x: cx, y: cy });
-          break;
-        }
+      if (firstErrorCell) {
+        setSelectedCell(firstErrorCell);
       }
 
       setLevelData({
@@ -539,9 +545,10 @@ function App() {
 
     const deletedTileId = (targetCell as any).tileId;
 
-    // Clear input
+    audioManager.playClick();
     targetCell.userChar = "";
     (targetCell as any).tileId = "";
+    targetCell.isError = false;
     
     // Restore tile in pool
     if (deletedTileId) {
@@ -756,6 +763,9 @@ function App() {
             <button className="btn btn-header btn-primary" onClick={() => setShowAuth(true)}>🔑 登入存檔</button>
           )}
           <button className="btn btn-header btn-secondary" onClick={() => setShowLeaderboard(true)}>🏆 榮譽榜</button>
+          <button className="btn btn-header btn-secondary" onClick={handleToggleMute}>
+            {isMuted ? "🔇 音效/音樂：關" : "🔊 音效/音樂：開"}
+          </button>
         </div>
       </header>
 
@@ -793,6 +803,7 @@ function App() {
                             ${isCorrect ? "user-correct" : ""} 
                             ${isSelected ? "selected" : ""} 
                             ${hasUserChar && !isRevealed && !isCorrect ? "user-filled" : ""}
+                            ${cell.isError ? "has-error" : ""}
                           `}
                           onClick={() => handleCellSelect(x, y)}
                         >

@@ -5,25 +5,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
 
 :root {
-  /* 溫馨暖色系調色盤 */
-  --bg-primary: #e6ccb2;       /* 溫和木質淺卡其背景 */
-  --bg-dark: #3d342e;          /* 沉穩深咖啡 */
+  /* 莫蘭迪綠色系護眼調色盤 */
+  --bg-primary: #c4d7cb;       /* 舒適柔和莫蘭迪淡綠色背景 */
+  --bg-dark: #3d443f;          /* 沉穩深松針綠 */
   
   --color-primary: #d96a43;    /* 溫暖柿子橙 */
   --color-secondary: #5c7f67;  /* 沉穩松針綠 */
   --color-accent: #f7b05b;     /* 溫馨芒果黃 */
   
-  --text-main: #3d342e;        /* 深咖啡色文字 */
-  --text-muted: #706258;       /* 灰褐色說明 */
+  --text-main: #343d38;        /* 深綠色文字 */
+  --text-muted: #5e6b63;       /* 灰綠色說明 */
   --text-light: #ffffff;
   
   --color-success: #4a8f66;    /* 竹綠 */
   --color-danger: #d94e34;     /* 柿紅 */
   
   /* 十字填字專用色 */
-  --wood-border: #7f5539;      /* 深木色框 */
-  --wood-light: #ede0d4;       /* 淺木紋底 */
-  --wood-dark: #b7b7a4;        /* 網格陰影板 */
+  --wood-border: #5d7063;      /* 深綠木框 */
+  --wood-light: #e6ede8;       /* 淺綠木紋底 */
+  --wood-dark: #b8c4bc;        /* 網格陰影板 */
   
   --char-yellow: #ffd166;      /* 經典大黃字卡底色 */
   --char-selected: #d90429;    /* 紅色選中格底色 */
@@ -55,7 +55,7 @@ body {
   padding: 0 16px;
   max-width: 900px;
   margin: 0 auto;
-  background-color: #faf6f0;
+  background-color: #edf3ee;
   box-shadow: 0 0 30px rgba(0,0,0,0.1);
 }
 
@@ -66,7 +66,7 @@ body {
   align-items: center;
   padding: 20px 16px;
   border-bottom: 4px solid var(--wood-border);
-  background-color: #f7f1e5;
+  background-color: #dbe7df;
   border-radius: 0 0 16px 16px;
   gap: 16px;
 }
@@ -280,15 +280,15 @@ body {
 /* 地圖節點：圓形地標 PIN */
 .map-node {
   position: absolute;
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  border: 3px solid #ffffff;
+  border: 4px solid #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-family);
-  font-size: 0.95rem;
+  font-size: 1.15rem;
   font-weight: 900;
   cursor: pointer;
   box-shadow: 0 4px 8px rgba(0,0,0,0.25);
@@ -327,16 +327,16 @@ body {
 }
 
 .map-node .lock-icon {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
 }
 
 /* 城市地名標籤 */
 .node-city-name {
   position: absolute;
-  top: 32px;
+  top: 44px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 0.78rem;
+  font-size: 0.92rem;
   color: #4a3319;
   background-color: rgba(255, 248, 240, 0.9);
   padding: 1px 5px;
@@ -526,6 +526,22 @@ body {
   transform: scale(1.08);
   z-index: 5;
   animation: selected-pulse 1s infinite alternate;
+}
+
+/* 錯誤的格子 (紅字、淡紅背景，並有輕微晃動動畫) */
+.grid-cell.letter-slot.has-error {
+  background-color: #ffe5e5;
+  color: var(--color-danger);
+  border: 2px solid var(--color-danger);
+  animation: shake 0.25s ease-in-out;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+  75% { transform: translateX(-4px); }
+  100% { transform: translateX(0); }
 }
 
 @keyframes selected-pulse {

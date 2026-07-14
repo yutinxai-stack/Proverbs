@@ -134,20 +134,7 @@ export function generateLevel(levelNumber: number): GameLevel {
     });
 
     let distractorCount = 0;
-    if (levelNumber > 10 && levelNumber <= 20) distractorCount = 2;
-    else if (levelNumber > 20 && levelNumber <= 35) distractorCount = 4;
-    else if (levelNumber > 35) distractorCount = 6;
-
     const distractors: string[] = [];
-    const poolRng = createRng(levelNumber + 777);
-    while (distractors.length < distractorCount) {
-      const randomIdiom = rawIdiomsAll[Math.floor(poolRng() * rawIdiomsAll.length)].i;
-      const randomChar = randomIdiom[Math.floor(poolRng() * 4)];
-      if (!hiddenChars.includes(randomChar) && !distractors.includes(randomChar) && !allCells.some(c => c.isSystemRevealed && c.char === randomChar)) {
-        distractors.push(randomChar);
-      }
-    }
-
     const charPool = shuffle([...hiddenChars, ...distractors], poolRng);
 
     return {
@@ -403,20 +390,7 @@ export function generateLevel(levelNumber: number): GameLevel {
   });
 
   let distractorCount = 0;
-  if (levelNumber > 10 && levelNumber <= 20) distractorCount = 2;
-  else if (levelNumber > 20 && levelNumber <= 35) distractorCount = 4;
-  else if (levelNumber > 35) distractorCount = 6;
-
   const distractors: string[] = [];
-  const poolRng = createRng(levelNumber + 777);
-  while (distractors.length < distractorCount) {
-    const randomIdiom = rawIdiomsAll[Math.floor(poolRng() * rawIdiomsAll.length)].i;
-    const randomChar = randomIdiom[Math.floor(poolRng() * 4)];
-    if (!hiddenChars.includes(randomChar) && !distractors.includes(randomChar) && !allCells.some(c => c.isSystemRevealed && c.char === randomChar)) {
-      distractors.push(randomChar);
-    }
-  }
-
   const charPool = shuffle([...hiddenChars, ...distractors], poolRng);
 
   return {
