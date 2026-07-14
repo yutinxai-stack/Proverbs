@@ -85,7 +85,7 @@ class AudioManager {
       let currentPathIndex = 0;
       this.bgm = new Audio(paths[currentPathIndex]);
       this.bgm.loop = true;
-      this.bgm.playbackRate = 0.8; // Play background music slower (0.8x) for relaxation
+      this.bgm.playbackRate = 0.5; // Play background music slower (0.5x) for relaxation
 
       // Handle loading error and try fallbacks
       this.bgm.addEventListener("error", () => {
@@ -93,16 +93,16 @@ class AudioManager {
         if (currentPathIndex < paths.length && this.bgm) {
           console.warn(`BGM path failed, trying fallback: ${paths[currentPathIndex]}`);
           this.bgm.src = paths[currentPathIndex];
-          this.bgm.playbackRate = 0.8;
+          this.bgm.playbackRate = 0.5;
           if (!this.isMuted) {
-            this.bgm.playbackRate = 0.8;
+            this.bgm.playbackRate = 0.5;
             this.bgm.play().catch(e => console.log("Fallback BGM play failed:", e));
           }
         }
       });
     }
     
-    this.bgm.playbackRate = 0.8;
+    this.bgm.playbackRate = 0.5;
     this.bgm.play().catch(err => {
       console.log("BGM play request blocked by browser autoplay policy:", err);
     });
