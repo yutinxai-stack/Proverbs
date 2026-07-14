@@ -3,6 +3,13 @@ class AudioManager {
   private bgm: HTMLAudioElement | null = null;
   public isMuted: boolean = false; // Default unmuted (enabled by default)
 
+  // Playlist of MP3 files inside data folder
+  private bgmPlaylist: string[] = [
+    "Alex Productions - Christmas Countdown.mp3",
+    "Glitch - West coast Rap Beat.mp3"
+  ];
+  private currentPlaylistIndex: number = 0;
+
   private initContext() {
     if (!this.ctx) {
       this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -19,7 +26,6 @@ class AudioManager {
       this.stopBGM();
     } else {
       this.startBGM();
-      this.playCorrect(); // Play feedback audio upon unmuting
     }
     return this.isMuted;
   }
@@ -74,34 +80,43 @@ class AudioManager {
     this.stopBGM();
     if (this.isMuted) return;
 
-    if (!this.bgm) {
-      const baseUrl = import.meta.env.BASE_URL || "/Proverbs/";
-      const paths = [
-        `${baseUrl}The_Way_the_River_Bends.mp3`,
-        `The_Way_the_River_Bends.mp3`,
-        `data/The_Way_the_River_Bends.mp3`
-      ];
-      
-      let currentPathIndex = 0;
-      this.bgm = new Audio(paths[currentPathIndex]);
-      this.bgm.loop = true;
-      this.bgm.playbackRate = 0.5; // Play background music slower (0.5x) for relaxation
-      this.bgm.volume = 0; // Initialize volume to 0 for fade-in
+    const baseUrl = import.meta.env.BASE_URL || "/Proverbs/";
+    const fileName = this.bgmPlaylist[this.currentPlaylistIndex];
+    const encodedFileName = encodeURIComponent(fileName);
 
-      // Handle loading error and try fallbacks
-      this.bgm.addEventListener("error", () => {
-        currentPathIndex++;
-        if (currentPathIndex < paths.length && this.bgm) {
-          console.warn(`BGM path failed, trying fallback: ${paths[currentPathIndex]}`);
-          this.bgm.src = paths[currentPathIndex];
+    const paths = [
+      `${baseUrl}data/${encodedFileName}`,
+      `data/${encodedFileName}`,
+      `${baseUrl}${encodedFileName}`,
+      encodedFileName
+    ];
+    
+    let currentPathIndex = 0;
+    this.bgm = new Audio(paths[currentPathIndex]);
+    this.bgm.loop = false; // Disable loop to allow playlist transition
+    this.bgm.playbackRate = 0.5; // Play background music slower (0.5x) for relaxation
+    this.bgm.volume = 0; // Initialize volume to 0 for fade-in
+
+    // Set end listener to rotate to the next track automatically
+    this.bgm.addEventListener("ended", () => {
+      this.currentPlaylistIndex = (this.currentPlaylistIndex + 1) % this.bgmPlaylist.length;
+      console.log(`BGM track ended. Next track index: ${this.currentPlaylistIndex}`);
+      this.startBGM();
+    });
+
+    // Handle loading error and try fallbacks
+    this.bgm.addEventListener("error", () => {
+      currentPathIndex++;
+      if (currentPathIndex < paths.length && this.bgm) {
+        console.warn(`BGM path failed, trying fallback: ${paths[currentPathIndex]}`);
+        this.bgm.src = paths[currentPathIndex];
+        this.bgm.playbackRate = 0.5;
+        if (!this.isMuted) {
           this.bgm.playbackRate = 0.5;
-          if (!this.isMuted) {
-            this.bgm.playbackRate = 0.5;
-            this.bgm.play().then(() => this.fadeInBGM()).catch(e => console.log("Fallback BGM play failed:", e));
-          }
+          this.bgm.play().then(() => this.fadeInBGM()).catch(e => console.log("Fallback BGM play failed:", e));
         }
-      });
-    }
+      }
+    });
     
     this.bgm.playbackRate = 0.5;
     this.bgm.play().then(() => {
@@ -136,6 +151,7 @@ class AudioManager {
     if (this.bgm) {
       this.bgm.pause();
       this.bgm.volume = 0;
+      this.bgm = null;
     }
   }
 }
