@@ -394,7 +394,7 @@ function App() {
       setSelectedCell(nextCellToJump);
     } else {
       // All cells in this idiom are filled! Verify if the idiom is correct.
-      verifyAndLockIdiom(activeIdiomIdx, updatedGrid, updatedPool);
+      verifyAndLockIdiom(activeIdiomIdx, updatedGrid);
       return;
     }
 
@@ -405,7 +405,7 @@ function App() {
   };
 
   // Verify and unlock an idiom if all 4 characters are correct
-  const verifyAndLockIdiom = (idiomIdx: number, currentGrid: (GridCell | null)[][], currentPool: PoolWord[]) => {
+  const verifyAndLockIdiom = (idiomIdx: number, currentGrid: (GridCell | null)[][]) => {
     const placed = levelData!.placedIdioms[idiomIdx];
     
     // Assemble filled chars

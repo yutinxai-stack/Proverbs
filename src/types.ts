@@ -22,6 +22,7 @@ export interface GridCell {
   userChar: string;      // 玩家目前填入的字元 (若為空字串 "" 代表未填)
   isSystemRevealed: boolean; // 是否為系統預設透露的字元
   isUserCorrect?: boolean;   // 玩家是否已經答對此格
+  isError?: boolean;         // 玩家是否填寫錯誤
   idiomIndices: number[]; // 這格字元所屬的 PlacedIdiom 索引 (可能橫直相交有兩個索引)
 }
 

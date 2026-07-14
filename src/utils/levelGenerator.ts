@@ -133,9 +133,8 @@ export function generateLevel(levelNumber: number): GameLevel {
       }
     });
 
-    let distractorCount = 0;
-    const distractors: string[] = [];
-    const charPool = shuffle([...hiddenChars, ...distractors], poolRng);
+    const poolRng = createRng(levelNumber + 777);
+    const charPool = shuffle([...hiddenChars], poolRng);
 
     return {
       levelNumber,
@@ -389,9 +388,8 @@ export function generateLevel(levelNumber: number): GameLevel {
     }
   });
 
-  let distractorCount = 0;
-  const distractors: string[] = [];
-  const charPool = shuffle([...hiddenChars, ...distractors], poolRng);
+  const poolRng = createRng(levelNumber + 777);
+  const charPool = shuffle([...hiddenChars], poolRng);
 
   return {
     levelNumber,
