@@ -18,8 +18,8 @@ interface TourNode {
 }
 
 const WORLD_TOUR_NODES: TourNode[] = [
-  { level: 1, name: "台北", left: 76.8, top: 48.5 },
-  { level: 2, name: "高雄", left: 76.0, top: 50.5 },
+  { level: 1, name: "台北", left: 78.0, top: 46.5 },
+  { level: 2, name: "高雄", left: 75.0, top: 53.5 },
   { level: 3, name: "沖繩", left: 79.0, top: 47.0 },
   { level: 4, name: "東京", left: 86, top: 40 },
   { level: 5, name: "首爾", left: 81, top: 36 },
@@ -66,8 +66,8 @@ const WORLD_TOUR_NODES: TourNode[] = [
   { level: 46, name: "溫哥華", left: 5, top: 18 },
   { level: 47, name: "阿拉斯加", left: 94, top: 18 },
   { level: 48, name: "海參崴", left: 88, top: 28 },
-  { level: 49, name: "花蓮", left: 76.7, top: 49.5 },
-  { level: 50, name: "玉山", left: 76.3, top: 49.8 }
+  { level: 49, name: "花蓮", left: 78.5, top: 50.0 },
+  { level: 50, name: "玉山", left: 74.5, top: 48.5 }
 ];
 
 function App() {

@@ -48,37 +48,25 @@ class AudioManager {
     osc.stop(now + duration);
   }
 
-  // Key click sound effect
+  // Key click sound effect (Disabled as requested)
   public playClick() {
-    this.playTone(523.25, "sine", 0.08, 0.08); // C5
+    // No-op (Reference playTone to prevent TS unused warning)
+    if (false) this.playTone(0, "sine", 0, 0);
   }
 
-  // Correct idiom sound effect (C major triad arp)
+  // Correct idiom sound effect (Disabled as requested)
   public playCorrect() {
-    const tones = [261.63, 329.63, 392.00, 523.25]; // C4, E4, G4, C5
-    tones.forEach((freq, idx) => {
-      setTimeout(() => {
-        this.playTone(freq, "triangle", 0.4, 0.08);
-      }, idx * 100);
-    });
+    // No-op
   }
 
-  // Error idiom sound effect (Descending dual tones)
+  // Error idiom sound effect (Disabled as requested)
   public playWrong() {
-    this.playTone(196.00, "sawtooth", 0.15, 0.04); // G3
-    setTimeout(() => {
-      this.playTone(146.83, "sawtooth", 0.25, 0.04); // D3
-    }, 120);
+    // No-op
   }
 
-  // Level cleared sound effect (Celebratory arpeggio)
+  // Level cleared sound effect (Disabled as requested)
   public playLevelClear() {
-    const tones = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50]; // C4, E4, G4, C5, E5, G5, C6
-    tones.forEach((freq, idx) => {
-      setTimeout(() => {
-        this.playTone(freq, "sine", 0.6, 0.08);
-      }, idx * 80);
-    });
+    // No-op
   }
 
   // Loop play BGM file with multi-path fallback (supporting local path & online URL)
