@@ -81,7 +81,7 @@ class AudioManager {
     });
   }
 
-  // Loop play target BGM file with multi-path fallback (supporting local path & online URL)
+  // Loop play BGM file with multi-path fallback (supporting local path & online URL)
   public startBGM() {
     this.stopBGM();
     if (this.isMuted) return;

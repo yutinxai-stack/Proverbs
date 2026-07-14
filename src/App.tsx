@@ -734,16 +734,7 @@ function App() {
   const handlePlayLevel = (num: number) => {
     setLevelNumber(num);
     setViewMode("game");
-    
-    // Once user interaction has occurred, start audio
-    const startAudio = () => {
-      audioManager.startBGM();
-      document.removeEventListener('click', startAudio);
-      document.removeEventListener('keydown', startAudio);
-    };
-    
-    document.addEventListener('click', startAudio);
-    document.addEventListener('keydown', startAudio);
+    audioManager.startBGM();
   };
 
   // Determine if selected cell has user inputs
