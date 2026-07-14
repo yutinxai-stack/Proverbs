@@ -1,6 +1,6 @@
 class AudioManager {
   private ctx: AudioContext | null = null;
-  private bgmInterval: any = null;
+  private bgm: HTMLAudioElement | null = null;
   public isMuted: boolean = true; // Default muted to comply with web autoplay policies
 
   private initContext() {
@@ -81,34 +81,25 @@ class AudioManager {
     });
   }
 
-  // Dynamic ambient piano background generator
+  // Loop play target BGM file
   public startBGM() {
     this.stopBGM();
     if (this.isMuted) return;
 
-    // Pentatonic scale to ensure pleasant and random harmonic overlaps (C4 to E5)
-    const pentatonic = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25];
+    if (!this.bgm) {
+      const baseUrl = import.meta.env.BASE_URL || "/Proverbs/";
+      this.bgm = new Audio(`${baseUrl}The_Way_the_River_Bends.mp3`);
+      this.bgm.loop = true;
+    }
     
-    const playMeasure = () => {
-      if (this.isMuted) return;
-      const noteCount = 2 + Math.floor(Math.random() * 2);
-      for (let i = 0; i < noteCount; i++) {
-        const randomNote = pentatonic[Math.floor(Math.random() * pentatonic.length)];
-        const delay = i * 400 + Math.random() * 200;
-        setTimeout(() => {
-          this.playTone(randomNote, "sine", 2.0, 0.015);
-        }, delay);
-      }
-    };
-
-    this.bgmInterval = setInterval(playMeasure, 4000);
-    playMeasure();
+    this.bgm.play().catch(err => {
+      console.log("BGM play request blocked by browser autoplay policy:", err);
+    });
   }
 
   public stopBGM() {
-    if (this.bgmInterval) {
-      clearInterval(this.bgmInterval);
-      this.bgmInterval = null;
+    if (this.bgm) {
+      this.bgm.pause();
     }
   }
 }
