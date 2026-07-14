@@ -617,7 +617,7 @@ function App() {
     }
 
     if (isAllFilled) {
-      verifyAndLockIdiom(activeIdiomIdx, updatedGrid, updatedPool);
+      verifyAndLockIdiom(activeIdiomIdx, updatedGrid);
     } else {
       // Select the next empty cell
       for (let i = 0; i < 4; i++) {
