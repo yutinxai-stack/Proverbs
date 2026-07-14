@@ -234,6 +234,19 @@ function App() {
     setPoolWords(words);
   }, [levelNumber, overridesTrigger]);
 
+  // Autoplay BGM on first user interaction (safari / chrome compatibility)
+  useEffect(() => {
+    const handleFirstInteraction = () => {
+      audioManager.startBGM();
+    };
+    window.addEventListener("click", handleFirstInteraction, { once: true });
+    window.addEventListener("touchstart", handleFirstInteraction, { once: true });
+    return () => {
+      window.removeEventListener("click", handleFirstInteraction);
+      window.removeEventListener("touchstart", handleFirstInteraction);
+    };
+  }, []);
+
   // Sync progress
   const saveProgress = async (newMaxLevel: number, newScore: number) => {
     if (currentUser) {
@@ -721,7 +734,16 @@ function App() {
   const handlePlayLevel = (num: number) => {
     setLevelNumber(num);
     setViewMode("game");
-    audioManager.startBGM();
+    
+    // Once user interaction has occurred, start audio
+    const startAudio = () => {
+      audioManager.startBGM();
+      document.removeEventListener('click', startAudio);
+      document.removeEventListener('keydown', startAudio);
+    };
+    
+    document.addEventListener('click', startAudio);
+    document.addEventListener('keydown', startAudio);
   };
 
   // Determine if selected cell has user inputs

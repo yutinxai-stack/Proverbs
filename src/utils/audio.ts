@@ -81,15 +81,34 @@ class AudioManager {
     });
   }
 
-  // Loop play target BGM file
+  // Loop play target BGM file with multi-path fallback (supporting local path & online URL)
   public startBGM() {
     this.stopBGM();
     if (this.isMuted) return;
 
     if (!this.bgm) {
       const baseUrl = import.meta.env.BASE_URL || "/Proverbs/";
-      this.bgm = new Audio(`${baseUrl}The_Way_the_River_Bends.mp3`);
+      const paths = [
+        `${baseUrl}The_Way_the_River_Bends.mp3`,
+        `The_Way_the_River_Bends.mp3`,
+        `data/The_Way_the_River_Bends.mp3`
+      ];
+      
+      let currentPathIndex = 0;
+      this.bgm = new Audio(paths[currentPathIndex]);
       this.bgm.loop = true;
+
+      // Handle loading error and try fallbacks
+      this.bgm.addEventListener("error", () => {
+        currentPathIndex++;
+        if (currentPathIndex < paths.length && this.bgm) {
+          console.warn(`BGM path failed, trying fallback: ${paths[currentPathIndex]}`);
+          this.bgm.src = paths[currentPathIndex];
+          if (!this.isMuted) {
+            this.bgm.play().catch(e => console.log("Fallback BGM play failed:", e));
+          }
+        }
+      });
     }
     
     this.bgm.play().catch(err => {

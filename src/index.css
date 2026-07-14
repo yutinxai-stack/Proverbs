@@ -546,6 +546,16 @@ body {
   z-index: 10 !important;
 }
 
+/* 當錯誤格被選中時，呈現非常明亮顯眼的金黃色外框，指示游標當前位置 */
+.grid-cell.letter-slot.selected.has-error {
+  background-color: var(--char-selected) !important;
+  color: #ffffff !important;
+  border: 4px solid #ffb703 !important; /* 醒目的黃色外框 */
+  box-shadow: 0 0 15px rgba(217, 4, 41, 0.8) !important;
+  transform: scale(1.08) !important;
+  z-index: 10 !important;
+}
+
 @keyframes shake {
   0% { transform: translateX(0); }
   25% { transform: translateX(-4px); }
