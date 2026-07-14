@@ -350,7 +350,9 @@ function App() {
     // 1. Update grid and cell
     const updatedGrid = [...levelData.grid.map(row => [...row])];
     const targetCell = { ...cell };
-    targetCell.isError = false;
+    
+    // Determine if filled character is correct for this specific slot
+    const isCharCorrect = word.char === targetCell.char;
     
     // If this slot was already filled by user, return that tile to pool first
     const previousTileId = (targetCell as any).tileId;
@@ -361,6 +363,13 @@ function App() {
     
     targetCell.userChar = word.char;
     (targetCell as any).tileId = word.id;
+    
+    if (isCharCorrect) {
+      targetCell.isError = false;
+    } else {
+      targetCell.isError = true;
+    }
+    
     updatedGrid[y][x] = targetCell;
 
     // 2. Mark the new tile as used
@@ -372,24 +381,14 @@ function App() {
     
     // Determine the next empty cell in this idiom to auto-jump
     let nextCellToJump: { x: number; y: number } | null = null;
-    const startIdx = currentIdiom.isHorizontal ? x - currentIdiom.x : y - currentIdiom.y;
     
-    // Scan forward from the current slot inside the active idiom
-    for (let offset = 1; offset < 4; offset++) {
-      const idxInIdiom = (startIdx + offset) % 4;
-      const tx = currentIdiom.isHorizontal ? currentIdiom.x + idxInIdiom : currentIdiom.x;
-      const ty = currentIdiom.isHorizontal ? currentIdiom.y : currentIdiom.y + idxInIdiom;
+    // ONLY auto-jump if the currently filled character is correct!
+    // If incorrect, cursor stays here so user can easily overwrite it, and error shows immediately.
+    if (isCharCorrect) {
+      const startIdx = currentIdiom.isHorizontal ? x - currentIdiom.x : y - currentIdiom.y;
       
-      const nextCell = updatedGrid[ty][tx];
-      if (nextCell && !nextCell.isSystemRevealed && !nextCell.isUserCorrect && nextCell.userChar === "") {
-        nextCellToJump = { x: tx, y: ty };
-        break;
-      }
-    }
-
-    // If no forward empty cells, scan backward from current slot
-    if (!nextCellToJump) {
-      for (let offset = 3; offset > 0; offset--) {
+      // Scan forward from the current slot inside the active idiom
+      for (let offset = 1; offset < 4; offset++) {
         const idxInIdiom = (startIdx + offset) % 4;
         const tx = currentIdiom.isHorizontal ? currentIdiom.x + idxInIdiom : currentIdiom.x;
         const ty = currentIdiom.isHorizontal ? currentIdiom.y : currentIdiom.y + idxInIdiom;
@@ -400,15 +399,35 @@ function App() {
           break;
         }
       }
+
+      // If no forward empty cells, scan backward from current slot
+      if (!nextCellToJump) {
+        for (let offset = 3; offset > 0; offset--) {
+          const idxInIdiom = (startIdx + offset) % 4;
+          const tx = currentIdiom.isHorizontal ? currentIdiom.x + idxInIdiom : currentIdiom.x;
+          const ty = currentIdiom.isHorizontal ? currentIdiom.y : currentIdiom.y + idxInIdiom;
+          
+          const nextCell = updatedGrid[ty][tx];
+          if (nextCell && !nextCell.isSystemRevealed && !nextCell.isUserCorrect && nextCell.userChar === "") {
+            nextCellToJump = { x: tx, y: ty };
+            break;
+          }
+        }
+      }
     }
 
-    // Set selected Cell
+    // Set selected Cell or verify answer
     if (nextCellToJump) {
       setSelectedCell(nextCellToJump);
     } else {
-      // All cells in this idiom are filled! Verify if the idiom is correct.
-      verifyAndLockIdiom(activeIdiomIdx, updatedGrid);
-      return;
+      if (!isCharCorrect) {
+        // Remain on the wrong cell
+        setSelectedCell({ x, y });
+      } else {
+        // If correct and no empty cells left, verify the entire idiom
+        verifyAndLockIdiom(activeIdiomIdx, updatedGrid);
+        return;
+      }
     }
 
     setLevelData({
