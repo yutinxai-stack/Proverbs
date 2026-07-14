@@ -1,7 +1,7 @@
 class AudioManager {
   private ctx: AudioContext | null = null;
   private bgm: HTMLAudioElement | null = null;
-  public isMuted: boolean = true; // Default muted to comply with web autoplay policies
+  public isMuted: boolean = false; // Default unmuted (enabled by default)
 
   private initContext() {
     if (!this.ctx) {

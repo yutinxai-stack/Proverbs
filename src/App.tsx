@@ -74,7 +74,7 @@ function App() {
   const [levelNumber, setLevelNumber] = useState<number>(1);
   const [maxUnlockedLevel, setMaxUnlockedLevel] = useState<number>(1);
   const [totalScore, setTotalScore] = useState<number>(0);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
 
   const handleToggleMute = () => {
     const nextMute = audioManager.toggleMute();
@@ -721,6 +721,7 @@ function App() {
   const handlePlayLevel = (num: number) => {
     setLevelNumber(num);
     setViewMode("game");
+    audioManager.startBGM();
   };
 
   // Determine if selected cell has user inputs
