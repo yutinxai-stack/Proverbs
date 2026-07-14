@@ -86,6 +86,7 @@ class AudioManager {
       this.bgm = new Audio(paths[currentPathIndex]);
       this.bgm.loop = true;
       this.bgm.playbackRate = 0.5; // Play background music slower (0.5x) for relaxation
+      this.bgm.volume = 0; // Initialize volume to 0 for fade-in
 
       // Handle loading error and try fallbacks
       this.bgm.addEventListener("error", () => {
@@ -96,21 +97,45 @@ class AudioManager {
           this.bgm.playbackRate = 0.5;
           if (!this.isMuted) {
             this.bgm.playbackRate = 0.5;
-            this.bgm.play().catch(e => console.log("Fallback BGM play failed:", e));
+            this.bgm.play().then(() => this.fadeInBGM()).catch(e => console.log("Fallback BGM play failed:", e));
           }
         }
       });
     }
     
     this.bgm.playbackRate = 0.5;
-    this.bgm.play().catch(err => {
+    this.bgm.play().then(() => {
+      this.fadeInBGM();
+    }).catch(err => {
       console.log("BGM play request blocked by browser autoplay policy:", err);
     });
+  }
+
+  // Smooth BGM volume fade-in transition to prevent shocking user
+  private fadeInBGM() {
+    if (!this.bgm || this.isMuted) return;
+    this.bgm.volume = 0;
+    const targetVolume = 0.5;
+    const step = 0.02;
+    const intervalTime = 100;
+
+    const timer = setInterval(() => {
+      if (!this.bgm || this.isMuted) {
+        clearInterval(timer);
+        return;
+      }
+      if (this.bgm.volume < targetVolume) {
+        this.bgm.volume = Math.min(targetVolume, this.bgm.volume + step);
+      } else {
+        clearInterval(timer);
+      }
+    }, intervalTime);
   }
 
   public stopBGM() {
     if (this.bgm) {
       this.bgm.pause();
+      this.bgm.volume = 0;
     }
   }
 }
