@@ -720,6 +720,20 @@ function App() {
       })
       .filter(Boolean);
 
+    // Generate unlocked levels list (sorted descending so latest level shows first)
+    const unlockedLevels = [];
+    for (let lvl = maxUnlockedLevel; lvl >= 1; lvl--) {
+      const nodeIndex = (lvl - 1) % 50;
+      const node = WORLD_TOUR_NODES[nodeIndex];
+      if (node) {
+        unlockedLevels.push({
+          levelNum: lvl,
+          name: node.name,
+          isActive: lvl === maxUnlockedLevel
+        });
+      }
+    }
+
     return (
       <div className="map-view-container" ref={mapContainerRef}>
         <div className="map-scroll-panel">
@@ -745,6 +759,29 @@ function App() {
             {/* Landmark nodes */}
             {mapNodes}
           </div>
+
+          {/* Quick Level Selector Carousel for elderly friendliness */}
+          <div className="quick-levels-section">
+            <div className="quick-levels-title">🗂 快速關卡傳送門（字大、極易點選）</div>
+            <div className="quick-levels-list">
+              {unlockedLevels.map(item => (
+                <button 
+                  key={item.levelNum}
+                  className={`quick-level-card ${item.isActive ? 'active' : ''}`}
+                  onClick={() => handlePlayLevel(item.levelNum)}
+                >
+                  <div className="card-level-num">第 {item.levelNum} 關</div>
+                  <div className="card-city-name">{item.name}</div>
+                  {item.isActive ? (
+                    <span className="card-status active">挑戰中 🔥</span>
+                  ) : (
+                    <span className="card-status cleared">已通關 ✓</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
         </div>
       </div>
     );
