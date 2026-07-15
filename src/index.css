@@ -1216,3 +1216,316 @@ body {
   color: #00796b;
 }
 
+/* ==========================================
+   🚂 台鐵環島小火車與經典站牌全新樣式
+   ========================================== */
+
+.train-map-container {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #edf3ee; /* 莫蘭迪護眼綠 */
+  padding: 30px 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+}
+
+.train-map-header {
+  text-align: center;
+  margin-bottom: 30px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.train-map-title {
+  font-size: 36px;
+  font-weight: 900;
+  color: #002d62; /* 經典台鐵深藍 */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.train-map-subtitle {
+  font-size: 20px;
+  color: #4a4a4a;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.train-map-subtitle strong {
+  color: #d90429;
+  font-size: 24px;
+  background: #fff3f3;
+  padding: 2px 8px;
+  border-radius: 8px;
+  border: 1px solid #ffccd5;
+}
+
+/* 鐵軌水平滾動容器 */
+.train-track-scroller {
+  width: 100%;
+  max-width: 1300px;
+  overflow-x: auto;
+  padding: 80px 20px 60px 20px; /* 給上方小火車預留足夠空間 */
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 3px solid #b7b7a4;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 滾動條加粗，極易滑動 */
+.train-track-scroller::-webkit-scrollbar {
+  height: 16px;
+}
+.train-track-scroller::-webkit-scrollbar-track {
+  background: #e9ecef;
+  border-radius: 8px;
+}
+.train-track-scroller::-webkit-scrollbar-thumb {
+  background: #002d62; /* 台鐵深藍滾動條 */
+  border-radius: 8px;
+  border: 3px solid #e9ecef;
+}
+
+/* 鐵軌路線佈局 */
+.railway-tracks {
+  display: flex;
+  gap: 60px;
+  padding-bottom: 20px;
+  position: relative;
+  /* 雙軌鐵路鋼軌 */
+  background-image: 
+    linear-gradient(to bottom, transparent 116px, #888888 116px, #444444 118px, transparent 118px, transparent 132px, #888888 132px, #444444 134px, transparent 134px),
+    /* 枕木重複背景 */
+    repeating-linear-gradient(90deg, #5c4033, #5c4033 12px, transparent 12px, transparent 40px);
+  background-size: 100% 250px, 100% 250px;
+  background-position: left center;
+}
+
+/* 車站節點 */
+.train-station-node {
+  flex: 0 0 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+/* 可愛小火車容器 */
+.steam-train-container {
+  position: absolute;
+  top: -95px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+}
+
+.steam-train-emoji {
+  font-size: 64px;
+  line-height: 1;
+  animation: train-shake 0.8s infinite ease-in-out alternate;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+}
+
+/* 蒸汽白雲冒出動畫 */
+.steam-puff {
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.9);
+  position: absolute;
+  top: -20px;
+  left: 20px;
+  opacity: 0;
+  animation: steam-float 1.2s infinite ease-out;
+}
+
+.puff-delayed {
+  animation-delay: 0.6s;
+}
+
+@keyframes train-shake {
+  0% { transform: translateY(0) scale(1) rotate(0deg); }
+  100% { transform: translateY(-5px) scale(1.03) rotate(-1deg); }
+}
+
+@keyframes steam-float {
+  0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
+  30% { opacity: 0.8; }
+  100% { transform: translate(-30px, -40px) scale(1.4); opacity: 0; }
+}
+
+/* 經典台鐵風格站牌卡片 */
+.train-station-card {
+  width: 240px;
+  height: 160px;
+  background: #ffffff;
+  border: 4px solid #b5b5b5;
+  border-radius: 12px;
+  padding: 0;
+  cursor: pointer;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.25s ease;
+}
+
+.train-station-card:hover:not(:disabled) {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* 當前挑戰中站牌 (金邊發光，帶呼吸燈效果) */
+.train-station-card.active {
+  border-color: #ffb703;
+  box-shadow: 0 0 20px rgba(255, 183, 3, 0.6), 0 8px 16px rgba(0, 0, 0, 0.1);
+  animation: active-pulse 1.5s infinite alternate;
+}
+
+@keyframes active-pulse {
+  0% { border-color: #ffb703; box-shadow: 0 0 10px rgba(255, 183, 3, 0.4); }
+  100% { border-color: #d90429; box-shadow: 0 0 25px rgba(217, 4, 41, 0.8); }
+}
+
+/* 已通關站牌 */
+.train-station-card.unlocked:not(.active) {
+  border-color: #007a33; /* 綠框 */
+}
+
+/* 未解鎖置灰站牌 */
+.train-station-card.locked {
+  background: #f1f3f5;
+  border-color: #ced4da;
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.train-station-card.locked .card-middle {
+  background-color: #adb5bd !important; /* 綠色橫條變灰色 */
+}
+
+/* 站牌上半部 */
+.card-top {
+  height: 64px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  gap: 8px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+/* 台鐵 SVG 局徽 */
+.tra-badge-logo {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.station-titles {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.station-name-zh {
+  font-size: 28px;
+  font-weight: 900;
+  color: #212529;
+  line-height: 1.1;
+}
+
+.station-name-en {
+  font-size: 13px;
+  color: #6c757d;
+  font-weight: bold;
+}
+
+/* 站牌中間：綠色色帶 */
+.card-middle {
+  height: 24px;
+  background-color: #007a33; /* 台鐵經典綠 */
+  color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 12px;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+/* 站牌下半部：左右站名 */
+.card-bottom {
+  flex: 1;
+  background: #ffffff;
+  display: flex;
+  border-top: 1px solid #e9ecef;
+}
+
+.side-station {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 4px;
+}
+
+.prev-side {
+  border-right: 1px solid #e9ecef;
+}
+
+.side-zh {
+  font-size: 16px;
+  font-weight: bold;
+  color: #495057;
+}
+
+.side-en {
+  font-size: 10px;
+  color: #868e96;
+}
+
+/* 狀態標籤 */
+.station-status-badge {
+  position: absolute;
+  bottom: 6px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.badge-txt {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.badge-txt.active {
+  background: #d90429;
+}
+
+.badge-txt.cleared {
+  background: #007a33;
+}
+
+.badge-txt.locked {
+  background: #6c757d;
+}
+

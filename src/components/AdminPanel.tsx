@@ -13,8 +13,13 @@ interface UserProgress {
 interface TourNode {
   level: number;
   name: string;
-  left: number;
-  top: number;
+  english: string;
+  prev: string;
+  prevEng: string;
+  next: string;
+  nextEng: string;
+  prevDist: number;
+  nextDist: number;
 }
 
 interface AdminPanelProps {

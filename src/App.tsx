@@ -13,61 +13,66 @@ import { doc, updateDoc, collection, getDocs } from "firebase/firestore";
 interface TourNode {
   level: number;
   name: string;
-  left: number; // 0-100%
-  top: number;  // 0-100%
+  english: string;
+  prev: string;
+  prevEng: string;
+  next: string;
+  nextEng: string;
+  prevDist: number;
+  nextDist: number;
 }
 
 const WORLD_TOUR_NODES: TourNode[] = [
-  { level: 1, name: "台北", left: 78.0, top: 46.5 },
-  { level: 2, name: "高雄", left: 75.0, top: 53.5 },
-  { level: 3, name: "沖繩", left: 79.0, top: 47.0 },
-  { level: 4, name: "東京", left: 86, top: 40 },
-  { level: 5, name: "首爾", left: 81, top: 36 },
-  { level: 6, name: "北京", left: 74, top: 30 },
-  { level: 7, name: "上海", left: 75, top: 42 },
-  { level: 8, name: "香港", left: 69, top: 50 },
-  { level: 9, name: "馬尼拉", left: 73, top: 62 },
-  { level: 10, name: "胡志明", left: 66, top: 60 },
-  { level: 11, name: "曼谷", left: 60, top: 55 },
-  { level: 12, name: "新加坡", left: 62, top: 70 },
-  { level: 13, name: "吉隆坡", left: 56, top: 67 },
-  { level: 14, name: "雅加達", left: 60, top: 80 },
-  { level: 15, name: "峇里島", left: 67, top: 82 },
-  { level: 16, name: "伯斯", left: 69, top: 92 },
-  { level: 17, name: "雪梨", left: 80, top: 90 },
-  { level: 18, name: "奧克蘭", left: 89, top: 91 },
-  { level: 19, name: "斐濟", left: 93, top: 78 },
-  { level: 20, name: "夏威夷", left: 96, top: 50 },
-  { level: 21, name: "關島", left: 88, top: 58 },
-  { level: 22, name: "新德里", left: 52, top: 46 },
-  { level: 23, name: "孟買", left: 48, top: 56 },
-  { level: 24, name: "杜拜", left: 41, top: 48 },
-  { level: 25, name: "開羅", left: 31, top: 48 },
-  { level: 26, name: "奈洛比", left: 33, top: 66 },
-  { level: 27, name: "開普敦", left: 23, top: 84 },
-  { level: 28, name: "馬達加斯加", left: 41, top: 76 },
-  { level: 29, name: "雅典", left: 27, top: 36 },
-  { level: 30, name: "羅馬", left: 19, top: 34 },
-  { level: 31, name: "巴黎", left: 11, top: 26 },
-  { level: 32, name: "倫敦", left: 9, top: 18 },
-  { level: 33, name: "雷克雅維克", left: 4, top: 10 },
-  { level: 34, name: "格陵蘭", left: 14, top: 8 },
-  { level: 35, name: "紐約", left: 24, top: 20 },
-  { level: 36, name: "華盛頓", left: 22, top: 28 },
-  { level: 37, name: "邁阿密", left: 26, top: 40 },
-  { level: 38, name: "哈瓦那", left: 20, top: 44 },
-  { level: 39, name: "里約", left: 35, top: 72 },
-  { level: 40, name: "布宜諾斯", left: 29, top: 82 },
-  { level: 41, name: "復活節島", left: 19, top: 70 },
-  { level: 42, name: "利馬", left: 12, top: 58 },
-  { level: 43, name: "墨西哥城", left: 6, top: 46 },
-  { level: 44, name: "洛杉磯", left: 4, top: 36 },
-  { level: 45, name: "舊金山", left: 3, top: 28 },
-  { level: 46, name: "溫哥華", left: 5, top: 18 },
-  { level: 47, name: "阿拉斯加", left: 94, top: 18 },
-  { level: 48, name: "海參崴", left: 88, top: 28 },
-  { level: 49, name: "花蓮", left: 78.5, top: 50.0 },
-  { level: 50, name: "玉山", left: 74.5, top: 48.5 }
+  { level: 1, name: "台北", english: "Taipei", prev: "松山", prevEng: "Songshan", next: "板橋", nextEng: "Banqiao", prevDist: 6.4, nextDist: 7.8 },
+  { level: 2, name: "板橋", english: "Banqiao", prev: "台北", prevEng: "Taipei", next: "樹林", nextEng: "Shulin", prevDist: 7.8, nextDist: 6.1 },
+  { level: 3, name: "樹林", english: "Shulin", prev: "板橋", prevEng: "Banqiao", next: "鶯歌", nextEng: "Yingge", prevDist: 6.1, nextDist: 7.3 },
+  { level: 4, name: "鶯歌", english: "Yingge", prev: "樹林", prevEng: "Shulin", next: "桃園", nextEng: "Taoyuan", prevDist: 7.3, nextDist: 8.2 },
+  { level: 5, name: "桃園", english: "Taoyuan", prev: "鶯歌", prevEng: "Yingge", next: "中壢", nextEng: "Zhongli", prevDist: 8.2, nextDist: 9.5 },
+  { level: 6, name: "中壢", english: "Zhongli", prev: "桃園", prevEng: "Taoyuan", next: "楊梅", nextEng: "Yangmei", prevDist: 9.5, nextDist: 8.8 },
+  { level: 7, name: "楊梅", english: "Yangmei", prev: "中壢", prevEng: "Zhongli", next: "新竹", nextEng: "Hsinchu", prevDist: 8.8, nextDist: 21.3 },
+  { level: 8, name: "新竹", english: "Hsinchu", prev: "楊梅", prevEng: "Yangmei", next: "竹南", nextEng: "Zhunan", prevDist: 21.3, nextDist: 15.6 },
+  { level: 9, name: "竹南", english: "Zhunan", prev: "新竹", prevEng: "Hsinchu", next: "苗栗", nextEng: "Miaoli", prevDist: 15.6, nextDist: 15.0 },
+  { level: 10, name: "苗栗", english: "Miaoli", prev: "竹南", prevEng: "Zhunan", next: "豐原", nextEng: "Fengyuan", prevDist: 15.0, nextDist: 43.5 },
+  { level: 11, name: "豐原", english: "Fengyuan", prev: "苗栗", prevEng: "Miaoli", next: "台中", nextEng: "Taichung", prevDist: 43.5, nextDist: 11.2 },
+  { level: 12, name: "台中", english: "Taichung", prev: "豐原", prevEng: "Fengyuan", next: "彰化", nextEng: "Changhua", prevDist: 11.2, nextDist: 17.5 },
+  { level: 13, name: "彰化", english: "Changhua", prev: "台中", prevEng: "Taichung", next: "員林", nextEng: "Yuanlin", prevDist: 17.5, nextDist: 15.8 },
+  { level: 14, name: "員林", english: "Yuanlin", prev: "彰化", prevEng: "Changhua", next: "田中", nextEng: "Tianzhong", prevDist: 15.8, nextDist: 11.4 },
+  { level: 15, name: "田中", english: "Tianzhong", prev: "員林", prevEng: "Yuanlin", next: "斗六", nextEng: "Douliu", prevDist: 11.4, nextDist: 19.3 },
+  { level: 16, name: "斗六", english: "Douliu", prev: "田中", prevEng: "Tianzhong", next: "嘉義", nextEng: "Chiayi", prevDist: 19.3, nextDist: 28.5 },
+  { level: 17, name: "嘉義", english: "Chiayi", prev: "斗六", prevEng: "Douliu", next: "新營", nextEng: "Xinying", prevDist: 28.5, nextDist: 28.1 },
+  { level: 18, name: "新營", english: "Xinying", prev: "嘉義", prevEng: "Chiayi", next: "台南", nextEng: "Tainan", prevDist: 28.1, nextDist: 41.7 },
+  { level: 19, name: "台南", english: "Tainan", prev: "新營", prevEng: "Xinying", next: "岡山", nextEng: "Gangshan", prevDist: 41.7, nextDist: 31.2 },
+  { level: 20, name: "岡山", english: "Gangshan", prev: "台南", prevEng: "Tainan", next: "新左營", nextEng: "Xinzuoying", prevDist: 31.2, nextDist: 11.8 },
+  { level: 21, name: "新左營", english: "Xinzuoying", prev: "岡山", prevEng: "Gangshan", next: "高雄", nextEng: "Kaohsiung", prevDist: 11.8, nextDist: 6.8 },
+  { level: 22, name: "高雄", english: "Kaohsiung", prev: "新左營", prevEng: "Kaohsiung", next: "鳳山", nextEng: "Fengshan", prevDist: 6.8, nextDist: 6.2 },
+  { level: 23, name: "鳳山", english: "Fengshan", prev: "高雄", prevEng: "Kaohsiung", next: "屏東", nextEng: "Pingtung", prevDist: 6.2, nextDist: 15.0 },
+  { level: 24, name: "屏東", english: "Pingtung", prev: "鳳山", prevEng: "Fengshan", next: "潮州", nextEng: "Chaozhou", prevDist: 15.0, nextDist: 15.2 },
+  { level: 25, name: "潮州", english: "Chaozhou", prev: "屏東", prevEng: "Pingtung", next: "枋寮", nextEng: "Fangliao", prevDist: 15.2, nextDist: 20.1 },
+  { level: 26, name: "枋寮", english: "Fangliao", prev: "潮州", prevEng: "Chaozhou", next: "大武", nextEng: "Dawu", prevDist: 20.1, nextDist: 46.2 },
+  { level: 27, name: "大武", english: "Dawu", prev: "枋寮", prevEng: "Fangliao", next: "太麻里", nextEng: "Taimali", prevDist: 46.2, nextDist: 28.5 },
+  { level: 28, name: "太麻里", english: "Taimali", prev: "大武", prevEng: "Dawu", next: "知本", nextEng: "Zhiben", prevDist: 28.5, nextDist: 11.7 },
+  { level: 29, name: "知本", english: "Zhiben", prev: "太麻里", prevEng: "Taimali", next: "台東", nextEng: "Taitung", prevDist: 11.7, nextDist: 11.0 },
+  { level: 30, name: "台東", english: "Taitung", prev: "知本", prevEng: "Zhiben", next: "關山", nextEng: "Guanshan", prevDist: 11.0, nextDist: 42.1 },
+  { level: 31, name: "關山", english: "Guanshan", prev: "台東", prevEng: "Taitung", next: "池上", nextEng: "Chishang", prevDist: 42.1, nextDist: 14.1 },
+  { level: 32, name: "池上", english: "Chishang", prev: "關山", prevEng: "Guanshan", next: "玉里", nextEng: "Yuli", prevDist: 14.1, nextDist: 25.1 },
+  { level: 33, name: "玉里", english: "Yuli", prev: "池上", prevEng: "Chishang", next: "瑞穗", nextEng: "Ruisui", prevDist: 25.1, nextDist: 23.4 },
+  { level: 34, name: "瑞穗", english: "Ruisui", prev: "玉里", prevEng: "Yuli", next: "光復", nextEng: "Guangfu", prevDist: 23.4, nextDist: 19.5 },
+  { level: 35, name: "光復", english: "Guangfu", prev: "瑞穗", prevEng: "Ruisui", next: "鳳林", nextEng: "Fenglin", prevDist: 19.5, nextDist: 14.2 },
+  { level: 36, name: "鳳林", english: "Fenglin", prev: "光復", prevEng: "Guangfu", next: "壽豐", nextEng: "Shoufeng", prevDist: 14.2, nextDist: 11.2 },
+  { level: 37, name: "壽豐", english: "Shoufeng", prev: "鳳林", prevEng: "Fenglin", next: "花蓮", nextEng: "Hualien", prevDist: 11.2, nextDist: 17.1 },
+  { level: 38, name: "花蓮", english: "Hualien", prev: "壽豐", prevEng: "Shoufeng", next: "新城", nextEng: "Xincheng", prevDist: 17.1, nextDist: 16.9 },
+  { level: 39, name: "新城", english: "Xincheng", prev: "花蓮", prevEng: "Hualien", next: "南澳", nextEng: "Nanao", prevDist: 16.9, nextDist: 46.2 },
+  { level: 40, name: "南澳", english: "Nanao", prev: "新城", prevEng: "Xincheng", next: "東澳", nextEng: "Dongao", prevDist: 46.2, nextDist: 11.0 },
+  { level: 41, name: "東澳", english: "Dongao", prev: "南澳", prevEng: "Nanao", next: "蘇澳新", nextEng: "Suaoxin", prevDist: 11.0, nextDist: 8.2 },
+  { level: 42, name: "蘇澳新", english: "Suaoxin", prev: "東澳", prevEng: "Dongao", next: "羅東", nextEng: "Luodong", prevDist: 8.2, nextDist: 8.3 },
+  { level: 43, name: "羅東", english: "Luodong", prev: "蘇澳新", prevEng: "Suaoxin", next: "宜蘭", nextEng: "Yilan", prevDist: 8.3, nextDist: 7.9 },
+  { level: 44, name: "宜蘭", english: "Yilan", prev: "羅東", prevEng: "Luodong", next: "礁溪", nextEng: "Jiaoxi", prevDist: 7.9, nextDist: 9.0 },
+  { level: 45, name: "礁溪", english: "Jiaoxi", prev: "宜蘭", prevEng: "Yilan", next: "頭城", nextEng: "Toucheng", prevDist: 9.0, nextDist: 5.6 },
+  { level: 46, name: "頭城", english: "Toucheng", prev: "礁溪", prevEng: "Jiaoxi", next: "福隆", nextEng: "Fulong", prevDist: 5.6, nextDist: 32.1 },
+  { level: 47, name: "福隆", english: "Fulong", prev: "頭城", prevEng: "Toucheng", next: "瑞芳", nextEng: "Ruifang", prevDist: 32.1, nextDist: 21.0 },
+  { level: 48, name: "瑞芳", english: "Ruifang", prev: "福隆", prevEng: "Fulong", next: "基隆", nextEng: "Keelung", prevDist: 21.0, nextDist: 12.0 },
+  { level: 49, name: "基隆", english: "Keelung", prev: "瑞芳", prevEng: "Ruifang", next: "松山", nextEng: "Songshan", prevDist: 12.0, nextDist: 20.3 },
+  { level: 50, name: "松山", english: "Songshan", prev: "基隆", prevEng: "Keelung", next: "台北", nextEng: "Taipei", prevDist: 20.3, nextDist: 6.4 }
 ];
 
 function App() {
@@ -156,40 +161,7 @@ function App() {
     }
   }, []);
 
-  // Auto scroll to active level node on map view load (robust retry system)
-  useEffect(() => {
-    if (viewMode === "map" && mapContainerRef.current && !showAuth) {
-      const levelInRound = ((maxUnlockedLevel - 1) % 50) + 1;
-      const activeNode = WORLD_TOUR_NODES.find(n => n.level === levelInRound);
-      if (activeNode) {
-        const container = mapContainerRef.current;
-        const canvasWidth = 1300;
-        const canvasHeight = 750;
-        const targetX = (activeNode.left / 100) * canvasWidth;
-        const targetY = (activeNode.top / 100) * canvasHeight;
 
-        // 瞬間瞬移定位，完全不進行任何滑動
-        container.style.scrollBehavior = "auto";
-        container.scrollLeft = targetX - container.clientWidth / 2;
-        container.scrollTop = targetY - container.clientHeight / 2;
-
-        let retries = 0;
-        const intervalId = setInterval(() => {
-          if (container && container.clientWidth > 0) {
-            container.scrollLeft = targetX - container.clientWidth / 2;
-            container.scrollTop = targetY - container.clientHeight / 2;
-            
-            retries++;
-            if (retries >= 15) {
-              clearInterval(intervalId);
-            }
-          }
-        }, 100);
-
-        return () => clearInterval(intervalId);
-      }
-    }
-  }, [viewMode, maxUnlockedLevel, showAuth]);
 
   // 2. Load Level whenever levelNumber changes
   useEffect(() => {
@@ -692,102 +664,114 @@ function App() {
   // Render Candy Crush style map path
   const renderMap = () => {
     const currentRound = Math.floor((maxUnlockedLevel - 1) / 50);
-    const activeIndexInRound = (maxUnlockedLevel - 1) % 50;
+    
+    // Get all stations in the current round
+    const stations = WORLD_TOUR_NODES.map((station, i) => {
+      const nodeLevel = currentRound * 50 + (i + 1);
+      const isPlayable = nodeLevel <= maxUnlockedLevel;
+      const isActive = nodeLevel === maxUnlockedLevel;
+      return {
+        ...station,
+        levelNumber: nodeLevel,
+        isPlayable,
+        isActive
+      };
+    });
 
-    // Generate flight connection paths for unlocked levels in the current round
-    const unlockedNodes = WORLD_TOUR_NODES.slice(0, activeIndexInRound + 1);
-    const unlockedD = unlockedNodes.map((n, i) => `${i === 0 ? 'M' : 'L'} ${n.left} ${n.top}`).join(" ");
+    const activeStation = stations.find(s => s.isActive) || stations[0];
 
-    // Only render node buttons that have been unlocked or are currently active in current round
-    const mapNodes = WORLD_TOUR_NODES
-      .map((node, i) => {
-        const nodeLevel = currentRound * 50 + (i + 1);
-        if (nodeLevel > maxUnlockedLevel) return null;
-
-        const isPlayable = nodeLevel <= maxUnlockedLevel;
-        const isActive = nodeLevel === maxUnlockedLevel;
-
-        return (
-          <button
-            key={nodeLevel}
-            className={`map-node ${isActive ? "active" : ""} ${isPlayable ? "unlocked" : "locked"}`}
-            style={{ left: `${node.left}%`, top: `${node.top}%` }}
-            onClick={() => isPlayable && handlePlayLevel(nodeLevel)}
-            disabled={!isPlayable}
-          >
-            <span className="level-num">{nodeLevel}</span>
-            <span className="node-city-name">{nodeLevel}. {node.name}</span>
-          </button>
-        );
-      })
-      .filter(Boolean);
-
-    // Generate unlocked levels list (sorted descending so latest level shows first, limit to latest 10 levels)
-    const unlockedLevels = [];
-    const maxLvlNum = Number(maxUnlockedLevel) || 1;
-    const startLvl = maxLvlNum;
-    const endLvl = Math.max(1, maxLvlNum - 9);
-
-    for (let lvl = startLvl; lvl >= endLvl; lvl--) {
-      const levelInRound = ((lvl - 1) % 50) + 1;
-      const node = WORLD_TOUR_NODES.find(n => n.level === levelInRound);
-      if (node) {
-        unlockedLevels.push({
-          levelNum: lvl,
-          name: node.name,
-          isActive: lvl === maxLvlNum
-        });
+    // Auto scroll to active station card
+    useEffect(() => {
+      if (viewMode === "map" && !showAuth) {
+        const timer = setTimeout(() => {
+          const activeCard = document.querySelector(".train-station-card.active");
+          if (activeCard) {
+            activeCard.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+          }
+        }, 150);
+        return () => clearTimeout(timer);
       }
-    }
+    }, [viewMode, maxUnlockedLevel, showAuth]);
 
     return (
-      <div className="map-view-container" ref={mapContainerRef}>
-        <div className="map-scroll-panel">
-          <div className="map-title-bar">
-            <div className="map-title">🌍 世界環球旅行地圖</div>
-            <p className="map-subtitle">從台灣出發環遊世界各地，挑戰成語大師！最高解鎖：第 {maxUnlockedLevel} 關</p>
-          </div>
-          
-          <div className="map-track-canvas world-map">
-            {/* SVG Flight Lines */}
-            <svg className="map-connection-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-              {/* Unlocked Route (Glowing Solid Line) */}
-              {unlockedD && (
-                <path
-                  d={unlockedD}
-                  fill="none"
-                  className="route-unlocked"
-                  strokeWidth="0.6"
-                />
-              )}
-            </svg>
+      <div className="train-map-container" ref={mapContainerRef}>
+        <div className="train-map-header">
+          <div className="train-map-title">🚂 溫馨台鐵環島鐵路之旅</div>
+          <p className="train-map-subtitle">
+            目前火車停靠在：<strong>第 {maxUnlockedLevel} 站 【{activeStation.name}】</strong>，請點選大站牌進入關卡！
+          </p>
+        </div>
 
-            {/* Landmark nodes */}
-            {mapNodes}
-          </div>
+        {/* Horizontal scrollable track area */}
+        <div className="train-track-scroller">
+          <div className="railway-tracks">
+            {stations.map(station => (
+              <div 
+                key={station.levelNumber} 
+                className={`train-station-node ${station.isActive ? "active-node" : ""}`}
+              >
+                {/* Cute train showing on top of the active station */}
+                {station.isActive && (
+                  <div className="steam-train-container">
+                    <div className="steam-puff">☁️</div>
+                    <div className="steam-puff puff-delayed">☁️</div>
+                    <span className="steam-train-emoji">🚂💨</span>
+                  </div>
+                )}
 
-          {/* Quick Level Selector Carousel for elderly friendliness */}
-          <div className="quick-levels-section">
-            <div className="quick-levels-title">🗂 快速關卡傳送門（字大、極易點選）</div>
-            <div className="quick-levels-list">
-              {unlockedLevels.map(item => (
-                <button 
-                  key={item.levelNum}
-                  className={`quick-level-card ${item.isActive ? 'active' : ''}`}
-                  onClick={() => handlePlayLevel(item.levelNum)}
+                {/* Taiwan Railway Style Station Board Card */}
+                <button
+                  className={`train-station-card ${station.isActive ? "active" : ""} ${station.isPlayable ? "unlocked" : "locked"}`}
+                  onClick={() => station.isPlayable && handlePlayLevel(station.levelNumber)}
+                  disabled={!station.isPlayable}
                 >
-                  <div className="card-level-num">第 {item.levelNum} 關</div>
-                  <div className="card-city-name">{item.name}</div>
-                  {item.isActive ? (
-                    <span className="card-status active">挑戰中 🔥</span>
-                  ) : (
-                    <span className="card-status cleared">已通關 ✓</span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
+                  {/* Top part: Logo and Station names */}
+                  <div className="card-top">
+                    <svg className="tra-badge-logo" viewBox="0 0 100 100">
+                      <circle cx="50" cy="50" r="40" fill="none" stroke="#002d62" strokeWidth="8" />
+                      <path d="M 25 50 L 75 50 M 50 25 L 50 75 M 32 32 L 68 68 M 32 68 L 68 32" stroke="#002d62" strokeWidth="6" />
+                      <circle cx="50" cy="50" r="22" fill="#ffffff" />
+                      <path d="M 40 38 L 60 38 M 50 38 L 50 62 M 35 62 L 65 62" stroke="#002d62" strokeWidth="7" strokeLinecap="round" />
+                    </svg>
+                    
+                    <div className="station-titles">
+                      <span className="station-name-zh">{station.name}</span>
+                      <span className="station-name-en">{station.english}</span>
+                    </div>
+                  </div>
 
+                  {/* Middle part: classic green bar with arrows */}
+                  <div className="card-middle">
+                    <span className="arrow-left">◀ {station.prevDist} 公里</span>
+                    <span className="arrow-right">{station.nextDist} 公里 ▶</span>
+                  </div>
+
+                  {/* Bottom part: adjacent stations */}
+                  <div className="card-bottom">
+                    <div className="side-station prev-side">
+                      <span className="side-zh">{station.prev}</span>
+                      <span className="side-en">{station.prevEng}</span>
+                    </div>
+                    <div className="side-station next-side">
+                      <span className="side-zh">{station.next}</span>
+                      <span className="side-en">{station.nextEng}</span>
+                    </div>
+                  </div>
+
+                  {/* Status indicator */}
+                  <div className="station-status-badge">
+                    {station.isActive ? (
+                      <span className="badge-txt active">挑戰中 🔥</span>
+                    ) : station.isPlayable ? (
+                      <span className="badge-txt cleared">已通關 ✓</span>
+                    ) : (
+                      <span className="badge-txt locked">未抵達 🔒</span>
+                    )}
+                  </div>
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
