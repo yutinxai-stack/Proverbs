@@ -720,16 +720,20 @@ function App() {
       })
       .filter(Boolean);
 
-    // Generate unlocked levels list (sorted descending so latest level shows first)
+    // Generate unlocked levels list (sorted descending so latest level shows first, limit to latest 10 levels)
     const unlockedLevels = [];
-    for (let lvl = maxUnlockedLevel; lvl >= 1; lvl--) {
-      const nodeIndex = (lvl - 1) % 50;
-      const node = WORLD_TOUR_NODES[nodeIndex];
+    const maxLvlNum = Number(maxUnlockedLevel) || 1;
+    const startLvl = maxLvlNum;
+    const endLvl = Math.max(1, maxLvlNum - 9);
+
+    for (let lvl = startLvl; lvl >= endLvl; lvl--) {
+      const levelInRound = ((lvl - 1) % 50) + 1;
+      const node = WORLD_TOUR_NODES.find(n => n.level === levelInRound);
       if (node) {
         unlockedLevels.push({
           levelNum: lvl,
           name: node.name,
-          isActive: lvl === maxUnlockedLevel
+          isActive: lvl === maxLvlNum
         });
       }
     }
