@@ -503,10 +503,10 @@ body {
   box-shadow: inset 0 -3px 0 #e5be3c, 0 2px 4px rgba(0,0,0,0.05);
 }
 
-/* 玩家答對的字元 (綠底白字) */
+/* 玩家答對的字元 (綠底黑字，高對比易讀) */
 .grid-cell.letter-slot.user-correct {
   background-color: var(--color-secondary);
-  color: #ffffff;
+  color: #000000;
   box-shadow: inset 0 -3px 0 #4c6a55, 0 2px 4px rgba(0,0,0,0.05);
 }
 
