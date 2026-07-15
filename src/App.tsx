@@ -270,9 +270,9 @@ function App() {
 
   const handleLoginSuccess = (username: string, score: number, level: number) => {
     setCurrentUser(username);
-    setTotalScore(score);
-    setLevelNumber(level);
-    setMaxUnlockedLevel(level);
+    setTotalScore(Number(score) || 0);
+    setLevelNumber(Number(level) || 1);
+    setMaxUnlockedLevel(Number(level) || 1);
     setViewMode("map"); // Go to map after login
   };
 
@@ -495,9 +495,10 @@ function App() {
         const finalScore = newScore + levelClearedBonus;
         setTotalScore(finalScore);
         
-        let newMax = maxUnlockedLevel;
-        if (levelNumber === maxUnlockedLevel && levelNumber < 1300) {
-          newMax = levelNumber + 1;
+        let newMax = Number(maxUnlockedLevel) || 1;
+        const currentLvlNum = Number(levelNumber) || 1;
+        if (currentLvlNum === newMax && currentLvlNum < 1300) {
+          newMax = currentLvlNum + 1;
           setMaxUnlockedLevel(newMax);
         }
         saveProgress(newMax, finalScore);
@@ -674,8 +675,9 @@ function App() {
       const nextLvl = levelNumber + 1;
       setLevelNumber(nextLvl);
       
-      let newMax = maxUnlockedLevel;
-      if (levelNumber === maxUnlockedLevel) {
+      let newMax = Number(maxUnlockedLevel) || 1;
+      const currentLvlNum = Number(levelNumber) || 1;
+      if (currentLvlNum === newMax) {
         newMax = nextLvl;
         setMaxUnlockedLevel(newMax);
       }
