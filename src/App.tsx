@@ -219,6 +219,19 @@ function App() {
     };
   }, []);
 
+  // Auto scroll to active station card in railway view
+  useEffect(() => {
+    if (viewMode === "map" && !showAuth) {
+      const timer = setTimeout(() => {
+        const activeCard = document.querySelector(".train-station-card.active");
+        if (activeCard) {
+          activeCard.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [viewMode, maxUnlockedLevel, showAuth]);
+
   // Sync progress
   const saveProgress = async (newMaxLevel: number, newScore: number) => {
     if (currentUser) {
@@ -679,19 +692,6 @@ function App() {
     });
 
     const activeStation = stations.find(s => s.isActive) || stations[0];
-
-    // Auto scroll to active station card
-    useEffect(() => {
-      if (viewMode === "map" && !showAuth) {
-        const timer = setTimeout(() => {
-          const activeCard = document.querySelector(".train-station-card.active");
-          if (activeCard) {
-            activeCard.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-          }
-        }, 150);
-        return () => clearTimeout(timer);
-      }
-    }, [viewMode, maxUnlockedLevel, showAuth]);
 
     return (
       <div className="train-map-container" ref={mapContainerRef}>
