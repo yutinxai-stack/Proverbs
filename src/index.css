@@ -1537,3 +1537,57 @@ body {
   background: #6c757d;
 }
 
+/* 鐵軌水平滾動包裝器與左右箭頭按鈕 */
+.railway-scroll-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 1300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.railway-nav-btn {
+  position: absolute;
+  top: calc(50% + 35px); /* 考慮到上方小火車的偏心高度 */
+  transform: translateY(-50%);
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #002d62; /* 經典深藍 */
+  color: #ffffff;
+  border: 4px solid #ffffff;
+  font-size: 32px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  z-index: 20;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.railway-nav-btn:hover {
+  background: #d90429; /* 懸停轉紅色 */
+  transform: translateY(-50%) scale(1.15);
+  box-shadow: 0 8px 25px rgba(217, 4, 41, 0.4);
+}
+
+.railway-nav-btn:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.railway-nav-btn.prev-btn {
+  left: -24px; /* 突出一半，方便點選 */
+}
+
+.railway-nav-btn.next-btn {
+  right: -24px;
+}
+
+/* 為了讓小火車能顯示在前面 */
+.steam-train-container {
+  z-index: 12 !important;
+}
+
