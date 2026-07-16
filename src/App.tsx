@@ -229,6 +229,15 @@ function App() {
     setShowAuth(false);
   };
 
+  const handleAdminUpdateUserProgress = (username: string, newLevel: number, newScore: number) => {
+    const currentStoredUser = localStorage.getItem("idiom_user");
+    if (currentStoredUser === username || currentUser === username) {
+      setMaxUnlockedLevel(newLevel);
+      setTotalScore(newScore);
+      setLevelNumber(newLevel);
+    }
+  };
+
   if (!levelData) {
     return <div className="loading-screen">遊戲載入中，請稍候...</div>;
   }
@@ -634,7 +643,7 @@ function App() {
 
   // Render Candy Crush style map path
   const renderMap = () => {
-    const currentRound = Math.floor((maxUnlockedLevel - 1) / 50);
+    const currentRound = Math.floor((maxUnlockedLevel - 1) / 250);
     
     // Dynamic railway theme definitions
     const themes = [
@@ -689,14 +698,14 @@ function App() {
       }
     ];
 
-    const themeId = currentRound % 4;
+    const themeId = Math.min(3, Math.max(0, currentRound));
     const theme = themes[themeId];
-    const startIndex = themeId * 50;
-    const themeStations = WORLD_TOUR_NODES.slice(startIndex, startIndex + 50);
+    const startIndex = themeId * 250;
+    const themeStations = WORLD_TOUR_NODES.slice(startIndex, startIndex + 250);
 
     // Get all stations in the current round
     const stations = themeStations.map((station, i) => {
-      const nodeLevel = currentRound * 50 + (i + 1);
+      const nodeLevel = themeId * 250 + (i + 1);
       const isPlayable = nodeLevel <= maxUnlockedLevel;
       const isActive = nodeLevel === maxUnlockedLevel;
       return {
@@ -864,7 +873,12 @@ function App() {
       {/* Main Area */}
       <main className="game-main">
         {currentUser === "owner" ? (
-          <AdminPanel onLogout={handleLogout} tourNodes={WORLD_TOUR_NODES} onRefreshOverrides={loadOverrides} />
+          <AdminPanel 
+            onLogout={handleLogout} 
+            tourNodes={WORLD_TOUR_NODES} 
+            onRefreshOverrides={loadOverrides} 
+            onUpdateUserProgress={handleAdminUpdateUserProgress}
+          />
         ) : viewMode === "map" ? (
           /* Candy Crush map */
           renderMap()

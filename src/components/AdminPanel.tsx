@@ -26,9 +26,10 @@ interface AdminPanelProps {
   onLogout: () => void;
   tourNodes: TourNode[];
   onRefreshOverrides: () => Promise<void>;
+  onUpdateUserProgress?: (username: string, newLevel: number, newScore: number) => void;
 }
 
-export const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout, tourNodes, onRefreshOverrides }) => {
+export const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout, tourNodes, onRefreshOverrides, onUpdateUserProgress }) => {
   const [users, setUsers] = useState<UserProgress[]>([]);
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<"Firebase 雲端" | "LocalStorage 本地">("LocalStorage 本地");
@@ -194,6 +195,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout, tourNodes, onR
       } else {
         localStorage.setItem(`idiom_level_${editingUser.username}`, String(editLevelVal));
         localStorage.setItem(`idiom_score_${editingUser.username}`, String(editScoreVal));
+      }
+      if (onUpdateUserProgress) {
+        onUpdateUserProgress(editingUser.username, editLevelVal, editScoreVal);
       }
       alert("儲存成功！");
       setEditingUser(null);
