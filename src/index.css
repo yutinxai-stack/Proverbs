@@ -1300,7 +1300,7 @@ body {
 .railway-tracks {
   display: flex;
   gap: 60px;
-  padding-bottom: 20px;
+  padding: 0 calc(50% - 150px) 20px calc(50% - 150px);
   position: relative;
   /* 雙軌鐵路鋼軌 */
   background-image: 
