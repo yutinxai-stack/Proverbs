@@ -1272,7 +1272,7 @@ body {
   width: 100%;
   max-width: 1300px;
   overflow-x: auto;
-  padding: 80px 20px 60px 20px; /* 給上方小火車預留足夠空間 */
+  padding: 130px 20px 60px 20px; /* 加大上方 padding，徹底防火車被截斷 */
   box-sizing: border-box;
   background: #ffffff;
   border: 3px solid #b7b7a4;
@@ -1323,7 +1323,7 @@ body {
 /* 可愛小火車容器 */
 .steam-train-container {
   position: absolute;
-  top: -95px;
+  top: -85px; /* 下移一點貼靠站牌，且完美在頂部 130px 空間內 */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1386,16 +1386,24 @@ body {
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
 }
 
-/* 當前挑戰中站牌 (金邊發光，帶呼吸燈效果) */
+.train-station-card.active:hover:not(:disabled) {
+  transform: scale(1.18) translateY(-6px);
+  box-shadow: 0 15px 30px rgba(255, 183, 3, 0.4);
+}
+
+/* 當前挑戰中站牌 (等比放大 15%、外邊距撐開，金邊發光，帶呼吸燈效果) */
 .train-station-card.active {
+  transform: scale(1.15);
+  margin: 0 20px; /* 增加兩側間距防止重疊 */
+  z-index: 5; /* 確保它高於左右兩站 */
   border-color: #ffb703;
-  box-shadow: 0 0 20px rgba(255, 183, 3, 0.6), 0 8px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 25px rgba(255, 183, 3, 0.7), 0 10px 20px rgba(0, 0, 0, 0.15);
   animation: active-pulse 1.5s infinite alternate;
 }
 
 @keyframes active-pulse {
-  0% { border-color: #ffb703; box-shadow: 0 0 10px rgba(255, 183, 3, 0.4); }
-  100% { border-color: #d90429; box-shadow: 0 0 25px rgba(217, 4, 41, 0.8); }
+  0% { border-color: #ffb703; box-shadow: 0 0 15px rgba(255, 183, 3, 0.5); }
+  100% { border-color: #d90429; box-shadow: 0 0 30px rgba(217, 4, 41, 0.9); }
 }
 
 /* 已通關站牌 */

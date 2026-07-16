@@ -696,7 +696,7 @@ function App() {
     return (
       <div className="train-map-container" ref={mapContainerRef}>
         <div className="train-map-header">
-          <div className="train-map-title">🚂 溫馨台鐵環島鐵路之旅</div>
+          <div className="train-map-title">🚂 台鐵環島鐵路之旅</div>
           <p className="train-map-subtitle">
             目前火車停靠在：<strong>第 {maxUnlockedLevel} 站 【{activeStation.name}】</strong>，請點選大站牌進入關卡！
           </p>
@@ -804,8 +804,8 @@ function App() {
       {/* Header */}
       <header className="game-header">
         <div className="header-logo">
-          <h1>🏮 溫馨成語接龍 🏮</h1>
-          <p className="subtitle">字大清晰、溫馨好玩！</p>
+          <h1>🏮 成語接龍 🏮</h1>
+          <p className="subtitle">字大清晰、好玩！</p>
         </div>
         <div className="header-user-status">
           <div className="header-score">🏆 積分：{totalScore} 分</div>
@@ -912,7 +912,7 @@ function App() {
 
       {/* Footer */}
       <footer className="game-footer">
-        <p>溫馨提示：字體超大、點擊好選。完成整張填字棋盤即可過關！</p>
+        <p>提示：字體超大、點擊好選。完成整張填字棋盤即可過關！</p>
       </footer>
 
       {/* Level Cleared Modal overlay */}
