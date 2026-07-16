@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { generateLevel, setLevelOverrides } from "./utils/levelGenerator";
 import { audioManager } from "./utils/audio";
 import type { GameLevel, GridCell } from "./types";
@@ -169,15 +169,23 @@ function App() {
     };
   }, []);
 
-  // Auto scroll to active station card in railway view
+  // Auto scroll and center the active station card in railway view
   useEffect(() => {
     if (viewMode === "map" && !showAuth) {
       const timer = setTimeout(() => {
-        const activeCard = document.querySelector(".train-station-card.active");
-        if (activeCard) {
-          activeCard.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+        const activeCard = document.querySelector(".train-station-card.active") as HTMLElement;
+        const scroller = document.querySelector(".train-track-scroller") as HTMLElement;
+        if (activeCard && scroller) {
+          const scrollerWidth = scroller.clientWidth;
+          const cardWidth = activeCard.offsetWidth;
+          const cardLeft = activeCard.offsetLeft;
+          const targetScrollLeft = cardLeft - (scrollerWidth / 2) + (cardWidth / 2);
+          scroller.scrollTo({
+            left: targetScrollLeft,
+            behavior: "smooth"
+          });
         }
-      }, 150);
+      }, 300);
       return () => clearTimeout(timer);
     }
   }, [viewMode, maxUnlockedLevel, showAuth]);
@@ -718,7 +726,7 @@ function App() {
         <div className="train-map-header">
           <div className="train-map-title">{theme.title}</div>
           <p className="train-map-subtitle">
-            目前火車停靠在：<strong>第 {maxUnlockedLevel} 站 【{activeStation.name}】</strong>，請點選大站牌進入關卡！
+            目前停靠在：<strong>第 {maxUnlockedLevel} 站 【{activeStation.name}】</strong>，請點選大站牌進入關卡！
           </p>
         </div>
 
